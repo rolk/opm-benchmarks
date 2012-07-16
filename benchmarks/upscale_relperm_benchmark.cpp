@@ -18,39 +18,40 @@
   along with OPM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* BENCHMARK VERSION 
+/**
+   @file upscale_relperm_benchmark.C
+   @brief Benchmark version of upscale_relperm.
 
-  This is a benchmark version of upscale_relperm, whose ordinary description is given below.
-  The main machinery is the same, but with some changes:
-  
-    - Input data (grid file and stone file) is not provided from command line, but is built in at compiler time.
-      The data is stored as strings in benchmark_input/benchmarkXXX_input_data.cpp included below.
-    - Other command line options are not supported
-    - The construction of eclParser and stone data is changed due to change in input routine
-    - All checks on number of input from command line are removed (since this no longer is valid)
-    - Some option defaults are changed: points = 20 
+   BENCHMARK VERSION 
+
+   This is a benchmark version of upscale_relperm, whose ordinary description is given below.
+   The main machinery is the same, but with some changes:
+   
+     - Input data (grid file and stone file) is not provided from command line, but is built in at compiler time.
+       The data is stored as strings in benchmark_input/benchmarkXXX_input_data.cpp included below.
+     - Other command line options are not supported
+     - The construction of eclParser and stone data is changed due to change in input routine
+     - All checks on number of input from command line are removed (since this no longer is valid)
+     - Some option defaults are changed: points = 20 
                                         upscaleBothPhases = 0 (false)
 					jFunctionCurve = 3
-    - All output is surpressed, except final output in step 9. For each finished upscaling, a star is printed,
-      so that one can see the overall progress.
-    - A test for verification of computed solution is implemented in Step 9. 
-      Reference solution is providedincluded from benchmark_input/benchmarkXXX_input_data.cpp
-    - Output provided in Step 9 is changed to fit the benchmark suite
+     - All output is surpressed, except final output in step 9. For each finished upscaling, a star is printed,
+       so that one can see the overall progress.
+     - A test for verification of computed solution is implemented in Step 9. 
+       Reference solution is providedincluded from benchmark_input/benchmarkXXX_input_data.cpp
+     - Output provided in Step 9 is changed to fit the benchmark suite
 
-  There are two models available with different model sizes. It is important that the model size don't fit into
-  the cache. The model type can be chosen below. 
+   There are two models available with different model sizes. It is important that the model size don't fit into
+   the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. To re-build simply run 'make'
+   inside the directory 'benchmarks' (where this source file is situated).
 
-  Assumptions:
-    - Only one stone type 
-    - Isotropic input data
-    - upscales only one phase 
-*/
+   Assumptions:
+     - Only one stone type 
+     - Isotropic input data
+     - upscales only one phase 
 
-/**
-   @file upscale_relperm.C
-   @brief Upscales relative permeability as a fuction of water saturation assuming capillary equilibrium.
 
-   Description: 
+   Original description of upscale_relperm:
  
    Reads in a lithofacies geometry in Eclipse format, reads in J(S_w)
    and relpermcurve(S_w) for each stone type, and calculates upscaled
@@ -85,6 +86,7 @@
    9: Print output to screen and optionally to file.
  
  */
+
 #include <config.h>
 
 #include <opm/core/utility/have_boost_redef.hpp>
@@ -107,16 +109,20 @@
 #include <dune/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model size:
-//   - Large: MODEL_TYPE 1   (1228230 active cells, 156714798 bytes, ~72 min on Statoil HPC Eddie Appnode using 7 nodes) 
-//   - Small: MODEL_TYPE 0    (175045 active cells,  22006171 bytes,  ~9 min on Statoil HPC Eddie Appnode using 7 nodes)
+//   - Large: MODEL_TYPE 1  (1228230 active cells, 156714798 bytes) 
+//   - Small: MODEL_TYPE 0   (175045 active cells,  22006171 bytes)
 
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'inputFilesToSyntax')
 #if MODEL_TYPE == 0
 #include <input/benchmark75_input_data.cpp>
+char model_name[] = "Small";
+//int model_size = 22006171;
 #elif MODEL_TYPE == 1
 #include <input/benchmark200_input_data.cpp>
+char model_name[] = "Large";
+//int model_size = 156714798;
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
 #endif
@@ -316,7 +322,7 @@ int main(int varnum, char** vararg)
    options.insert(make_pair("oilDensity",         "0.6")); // ditto
    options.insert(make_pair("interpolate",        "0"));    // default is not to interpolate
    options.insert(make_pair("maxpoints",          "1000")); // maximal number of saturation points.
-   options.insert(make_pair("outputprecision",    "4")); // number of significant numbers to print
+   options.insert(make_pair("outputprecision",    "20")); // number of significant numbers to print [benchmark]
    options.insert(make_pair("maxPermContrast",    "1e7")); // maximum allowed contrast in each single-phase computation
    options.insert(make_pair("minPerm",            "1e-12")); // absolute minimum for allowed cell permeability
    options.insert(make_pair("maxPerm",            "100000")); // maximal allowed cell permeability
@@ -1935,7 +1941,7 @@ int main(int varnum, char** vararg)
      bool saturationsEqual = true;
      bool relpermsEqual = true;
      bool referenceResultsMatch = true;
-     double tolerance = 1e-12;
+     double tolerance = 1e-10;
 
      vector<double> tempVec;
      RelPermValuesReference.push_back(tempVec);
@@ -2022,8 +2028,20 @@ int main(int varnum, char** vararg)
 #else
      outputtmp << "upscale_relperm, no-MPI version (" << versiondate << ")" << endl;
 #endif
-
      outputtmp << "Part of the OPM project, http://www.opm-project.org\n";
+
+     // Calculate approx model size
+     int nCellsTotal = x_res*y_res*z_res;
+     int model_size = (8*nCellsTotal + 2*nCellsTotal + (x_res+1)*(y_res+1)*2)*sizeof(double) + 2*nCellsTotal*sizeof(int);
+
+     outputtmp << dashed_line;
+     outputtmp << "Model type :      " << model_name << " (" << ECLIPSEFILENAME << ")" << endl;
+     outputtmp << "Active cells:     " << tesselatedCells << endl;
+     outputtmp << "Model size:       ~" << model_size/1000000 << " MB" << endl;
+     outputtmp << "Upscaling points: " << points << endl;
+     // outputtmp << "Stone file:       " << JfunctionNames[1] << endl;
+     outputtmp << "The size should be larger than cache memory to avoid cache effects.\n"
+       "Model type can be changed by editing macro 'MODEL_TYPE' in source file." << endl;
 
 #ifdef HAVE_MPI
      outputtmp << dashed_line;
@@ -2031,12 +2049,6 @@ int main(int varnum, char** vararg)
      double speedup = (avg_upscaling_time_pr_point * (points + 1) + timeused_tesselation)/(timeused_upscale_wallclock + avg_upscaling_time_pr_point + timeused_tesselation);
      outputtmp << "Speedup:   " << speedup << endl;
 #endif 
-
-     outputtmp << dashed_line;
-     outputtmp << "Eclipse file:     " << ECLIPSEFILENAME << endl;
-     outputtmp << "Stone file:       " << JfunctionNames[1] << endl;
-     outputtmp << "Active cells:     " << tesselatedCells << endl;
-     outputtmp << "Upscaling points: " << points << endl;
 
      outputtmp << dashed_line << "Verification of results:" << endl;
      if (!referenceResultsMatch) {
@@ -2082,6 +2094,7 @@ int main(int varnum, char** vararg)
 
    /*
    if (isMaster) {
+
        stringstream outputtmp;
        
        // Print a table of all computed values:
