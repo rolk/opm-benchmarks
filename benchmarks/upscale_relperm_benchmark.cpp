@@ -110,9 +110,8 @@
 #include <dune/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model size:
-//   - Small: MODEL_TYPE 0   (175045 active cells,  ~22 MB)
+//   - Small: MODEL_TYPE 0   (175045 active cells,  ~23 MB)
 //   - Large: MODEL_TYPE 1  (1228230 active cells, ~155 MB) 
-
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
@@ -2058,14 +2057,14 @@ int main(int varnum, char** vararg)
      else if (pressuresEqual && saturationsEqual && relpermsEqual) {
        outputtmp << "Computed results are verified to be equal to reference\n"
 		 << "solution within an absolute tolerance of " << tolerance << ".\n"
-	         << "The tolerance should be close to computer precision, and\n"
-	         << "can be changed in the source file.\n";
+	         << "The tolerance should be close to computer precision,\n"
+	         << "and can be changed in the source file.\n";
      }
      else {
        outputtmp << "Computed results are not equal to reference solution\n"
 		 << "within an absolute tolerance of " << tolerance << ".\n"
-                 << "The tolerance should be close to computer precision, and\n"
-	         << "can be changed in the source file.\n";
+                 << "The tolerance should be close to computer precision,\n"
+	         << "and can be changed in the source file.\n";
      }
     
      outputtmp << dashed_line;
