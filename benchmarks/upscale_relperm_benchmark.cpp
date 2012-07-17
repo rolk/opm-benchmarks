@@ -2057,11 +2057,15 @@ int main(int varnum, char** vararg)
      }
      else if (pressuresEqual && saturationsEqual && relpermsEqual) {
        outputtmp << "Computed results are verified to be equal to reference\n"
-		 << "solution within an absolute tolerance of " << tolerance << ".\n";
+		 << "solution within an absolute tolerance of " << tolerance << ".\n"
+	         << "The tolerance should be close to computer precision, and\n"
+	         << "can be changed in the source file.\n";
      }
      else {
        outputtmp << "Computed results are not equal to reference solution\n"
-		 << "within an absolute tolerance of " << tolerance << ".\n";
+		 << "within an absolute tolerance of " << tolerance << ".\n"
+                 << "The tolerance should be close to computer precision, and\n"
+	         << "can be changed in the source file.\n";
      }
     
      outputtmp << dashed_line;
