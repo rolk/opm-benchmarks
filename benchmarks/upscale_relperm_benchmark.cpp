@@ -109,20 +109,18 @@
 #include <dune/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model size:
-//   - Large: MODEL_TYPE 1  (1228230 active cells, 156714798 bytes) 
-//   - Small: MODEL_TYPE 0   (175045 active cells,  22006171 bytes)
+//   - Small: MODEL_TYPE 0   (175045 active cells,  ~22 MB)
+//   - Large: MODEL_TYPE 1  (1228230 active cells, ~155 MB) 
 
 #define MODEL_TYPE 0
 
-// Benchmark input data (this file can be generated from script 'inputFilesToSyntax')
+// Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
 #include <input/benchmark75_input_data.cpp>
 char model_name[] = "Small";
-//int model_size = 22006171;
 #elif MODEL_TYPE == 1
 #include <input/benchmark200_input_data.cpp>
 char model_name[] = "Large";
-//int model_size = 156714798;
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
 #endif
