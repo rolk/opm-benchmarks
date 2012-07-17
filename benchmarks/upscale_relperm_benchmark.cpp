@@ -42,8 +42,9 @@
      - Output provided in Step 9 is changed to fit the benchmark suite
 
    There are two models available with different model sizes. It is important that the model size don't fit into
-   the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. To re-build simply run 'make'
-   inside the directory 'benchmarks' (where this source file is situated).
+   the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. The tolerance to be used when 
+   comparing results can also be changed below. The tolerance should be close to computer precision. To re-build 
+   simply run 'make' inside the directory 'benchmarks' (where this source file is situated).
 
    Assumptions:
      - Only one stone type 
@@ -124,6 +125,9 @@ char model_name[] = "Large";
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
 #endif
+
+// Define tolerance to be used when comparing results. Should be close to computer precision.
+double tolerance = 1e-15;
 
 using namespace Dune;
 using namespace std;
@@ -1939,7 +1943,6 @@ int main(int varnum, char** vararg)
      bool saturationsEqual = true;
      bool relpermsEqual = true;
      bool referenceResultsMatch = true;
-     double tolerance = 1e-10;
 
      vector<double> tempVec;
      RelPermValuesReference.push_back(tempVec);
