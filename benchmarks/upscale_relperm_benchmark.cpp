@@ -28,7 +28,7 @@
    The main machinery is the same, but with some changes:
    
      - Input data (grid file and stone file) is not provided from command line, but is built in at compiler time.
-       The data is stored as strings in benchmark_input/benchmarkXXX_input_data.cpp included below.
+       The data is stored as strings in input/benchmarkXXX_input_data.cpp, which is included below.
      - Other command line options are not supported
      - The construction of eclParser and stone data is changed due to change in input routine
      - All checks on number of input from command line are removed (since this no longer is valid)
@@ -38,7 +38,7 @@
      - All output is surpressed, except final output in step 9. For each finished upscaling, a star is printed,
        so that one can see the overall progress.
      - A test for verification of computed solution is implemented in Step 9. 
-       Reference solution is providedincluded from benchmark_input/benchmarkXXX_input_data.cpp
+       Reference solution is included in input/benchmarkXXX_input_data.cpp
      - Output provided in Step 9 is changed to fit the benchmark suite
 
    There are two models available with different model sizes. It is important that the model size don't fit into
@@ -2018,7 +2018,7 @@ int main(int varnum, char** vararg)
      double benchmark_time_min = floor(benchmark_time/60.0);
      double benchmark_time_sec = benchmark_time - benchmark_time_min*60;
      stringstream outputtmp;
-     string versiondate = "19.06.2012";
+     string versiondate = "17.07.2012";
      string dashed_line = "----------------------------------------------------------------------\n";
      
      outputtmp << endl;
