@@ -109,9 +109,9 @@
 #include <opm/core/utility/MonotCubicInterpolator.hpp>
 #include <dune/upscaling/SinglePhaseUpscaler.hpp>
 
-// Choose model size:
-//   - Small: MODEL_TYPE 0   (175045 active cells,  ~23 MB)
-//   - Large: MODEL_TYPE 1  (1228230 active cells, ~155 MB) 
+// Choose model:
+//   - Small: MODEL_TYPE 0  (175045 active cells, ~23 MB)
+//   - Large: MODEL_TYPE 1  (711539 active cells, ~93 MB) 
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
@@ -119,7 +119,7 @@
 #include <input/benchmark75_input_data.cpp>
 char model_name[] = "Small";
 #elif MODEL_TYPE == 1
-#include <input/benchmark200_input_data.cpp>
+#include <input/benchmark150_input_data.cpp>
 char model_name[] = "Large";
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
