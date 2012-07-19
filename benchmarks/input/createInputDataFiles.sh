@@ -15,10 +15,10 @@
 # The resulting file must be included in upscale_relperm_benchmark.
 
 # Define files as variables
-gridfile=benchmark200.grdecl
-resultfile=benchmark200_upscaled_relperm_20points.txt
+gridfile=benchmark75.grdecl
+resultfile=benchmark75_upscaled_relperm_20points.txt
 stonefile=stonefile_benchmark.txt
-cfile=benchmark200_input_data.cpp
+cfile=benchmark75_input_data.cpp
 
 tmp1=temp_file1.txt
 tmp2=temp_file2.txt
@@ -67,7 +67,8 @@ echo "" >> $tmp3
 # Merge files
 ################################
 
-echo "// This file is created from createInputDataFiles.sh." > $cfile
+echo "// Date: "$(date) > $cfile 
+echo "// This file is created from createInputDataFiles.sh." >> $cfile
 echo "// It contains input data and reference solution stored as strings." >> $cfile
 echo "// To be included in upscale_relperm_benchmark." >> $cfile
 echo "" >> $cfile
