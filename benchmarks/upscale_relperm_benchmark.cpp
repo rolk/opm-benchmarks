@@ -43,8 +43,8 @@
 
    There are two models available with different model sizes. It is important that the model size don't fit into
    the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. The tolerance to be used when 
-   comparing results can also be changed below. The tolerance should be close to computer precision. To re-build 
-   simply run 'make' inside the directory 'benchmarks' (where this source file is situated).
+   comparing results can also be changed below. To re-build simply run 'make' inside the directory 'benchmarks' 
+   (where this source file is situated).
 
    Assumptions:
      - Only one stone type 
@@ -125,8 +125,8 @@ char model_name[] = "Large";
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
 #endif
 
-// Define tolerance to be used when comparing results. Should be close to computer precision.
-double tolerance = 1e-15;
+// Define tolerance to be used when comparing results. 
+double tolerance = 1e-10;
 
 using namespace Dune;
 using namespace std;
@@ -2052,19 +2052,18 @@ int main(int varnum, char** vararg)
 
      outputtmp << dashed_line << "Verification of results:" << endl;
      if (!referenceResultsMatch) {
-       outputtmp << "The number of upscaled points does not match the number of \nupscaled points in reference solution. Validation not possible.\n";
+       outputtmp << "The number of upscaled points does not match the number of \n"
+	         << "upscaled points in reference solution. Validation not possible.\n";
      }
      else if (pressuresEqual && saturationsEqual && relpermsEqual) {
        outputtmp << "Computed results are verified to be equal to reference\n"
 		 << "solution within an absolute tolerance of " << tolerance << ".\n"
-	         << "The tolerance should be close to computer precision,\n"
-	         << "and can be changed in the source file.\n";
+	         << "The tolerance can be changed in the source file.\n";
      }
      else {
        outputtmp << "Computed results are not equal to reference solution\n"
 		 << "within an absolute tolerance of " << tolerance << ".\n"
-                 << "The tolerance should be close to computer precision,\n"
-	         << "and can be changed in the source file.\n";
+                 << "The tolerance can be changed in the source file.\n";
      }
     
      outputtmp << dashed_line;
