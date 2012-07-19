@@ -147,71 +147,6 @@ void usage() // Benchmark version
     "the model and stone data is included at compiler time." << endl;
 }
 
-/* Original version
-upscale_relperm <options> <eclipsefile> stoneA.txt stoneB.txt ..." << endl << 
-        "where the options are:" << endl <<
-        "  -bc <string>                 -- which boundary conditions to use." << endl << 
-        "                                  Possible values are f (fixed), l (linear)" << endl << 
-        "                                  and p (periodic). Default f (fixed)." << endl << 
-        "  -points <integer>            -- Number of saturation points to upscale for." << endl <<
-        "                                  Uniformly distributed within saturation endpoints." << endl <<
-        "                                  Default 30." << endl << 
-        "  -relPermCurve <integer>      -- For isotropic input, the column number in the stone-files" << endl <<
-        "                                  that represents the phase to be upscaled," << endl << 
-        "                                  typically 2 (default) for water and 3 for oil." << endl <<
-        "  -jFunctionCurve <integer>    -- the column number in the stone-files that" << endl << 
-        "                                  represent the Leverett J-function. Default 4." << endl <<
-        "  -upscaleBothPhases <bool>    -- If this is true, relperm for both phases will be upscaled" << endl <<
-        "                                  and both will be outputted to Eclipse format. Default true." << endl <<
-        "                                  For isotropic input, relPermCurves is assumed to be 2 and 3," << endl <<
-        "                                  for anisotropic input, relPermCurves are assumed to be 3-5" << endl <<
-        "                                  and 6-8 respectively for the two phases" << endl <<
-        "  -gravity <float>             -- use 9.81 for standard gravity. Default zero. Unit m/s^2." << endl <<
-        "  -surfaceTension <float>      -- Surface tension to use in J-function/Pc conversion." << endl << 
-        "                                  Default 11 dynes/cm (oil-water systems). In absence of" << endl <<  
-        "                                  a correct value, the surface tension for gas-oil systems " << endl << 
-        "                                  could be 22.5 dynes/cm." << endl << 
-        "  -waterDensity <float>        -- density of water, only applicable to non-zero" << endl <<
-        "                                  gravity, g/cm³. Default 1" << endl <<
-        "  -oilDensity <float>          -- density of oil, only applicable to non-zero" << endl <<
-        "                                  gravity, g/cm³. Default 0.6" << endl <<
-        "  -output <string>             -- filename for where to write upscaled values." << endl <<
-        "                                  If not supplied, output will only go to " << endl <<
-        "                                  the terminal (standard out)." << endl <<
-        "  -interpolate <integer>       -- If supplied, the output data points will be" << endl <<
-        "                                  interpolated using monotone cubic interpolation" << endl <<
-        "                                  on a uniform grid with the specified number of" << endl <<
-        "                                  points. Suggested value: 1000." << endl <<
-        "  -maxPermContrast <float>     -- maximal permeability contrast in model." << endl <<
-        "                                  Default 10^7" << endl <<
-        "  -minPerm <float>             -- Minimum floating point value allowed for" << endl << 
-        "                                  phase permeability in computations. If set to zero," << endl << 
-        "                                  some models can end up singular. Default 10^-12" << endl << 
-        "  -maxPerm <float>             -- Maximum floating point value allowed for" << endl <<
-        "                                  permeability. " << endl <<
-        "                                  Default 100000. Unit Millidarcy." << endl <<
-        "  -fluids <string>             -- Either ow for oil/water systems or go for gas/oil systems. Default ow." << endl <<
-        "                                  In case of go, the waterDensity option should be set to gas density" << endl <<
-        "                                  Also remember to specify the correct surface tension" << endl <<
-        "  -krowxswirr <float>          -- Oil relative permeability in x-direction at Swirr(from SWOF table)." << endl <<
-        "                                  In case of oil/gas, this value is needed to ensure consistensy" << endl <<
-        "                                  between SWOF and SGOF tables. Only has affect if fluids is set to go" << endl <<
-        "                                  and upscaleBothPhases is true." << endl <<
-        "                                  If not set, the point is not inserted into the final table." << endl <<
-        "  -krowyswirr <float>          -- Oil relative permeability in y-direction at Swirr(from SWOF table). See krowxswirr." << endl <<
-        "  -krowzswirr <float>          -- Oil relative permeability in z-direction at Swirr(from SWOF table). See krowxswirr." << endl <<
-        "  -doEclipseCheck <bool>       -- Default true. Check that input relperm curves includes relperms at critical" << endl <<
-        "                                  saturation points, i.e. that krw(swcrit)=0 and krow(swmax) = 0 and similar for oil/gas." << endl <<
-        "  -critRelpermThresh <float>   -- If minimum relperm values are less than this threshold, they are set to zero" << endl <<
-        "                                  and will pass the EclipseCheck. Default 10^-6" << endl <<
-        "If only one stone-file is supplied, it is used for all stone-types defined" << endl <<
-        "in the geometry. If more than one, it corresponds to the SATNUM-values." << endl;
-    // "minPoro" intentionally left undocumented
-    // "saturationThreshold"  also
-}
-*/
-
-
 void usageandexit() {
     usage();
 #ifdef HAVE_MPI
@@ -295,13 +230,7 @@ int main(int varnum, char** vararg)
    MPI_Comm_size(MPI_COMM_WORLD, &mpi_nodecount);
 #endif 
    bool isMaster = (mpi_rank == 0);
-   
-   /*
-   if (varnum == 1) { If no arguments supplied ("upscale_relperm" is the first "argument")
-      usage();
-      exit(1);
-   }
-   */
+ 
 
    if (varnum > 1) { // If arguments are supplied, show error ("upscale_relperm_benchmark" is the first (and only) "argument")
       usageandexit();
@@ -345,48 +274,6 @@ int main(int varnum, char** vararg)
    const double milliDarcyToSqMetre = 9.869233e-16;
    // Reference: http://www.spe.org/spe-site/spe/spe/papers/authors/Metric_Standard.pdf
 
-   /* Check first if there is anything on the command line to look for 
-   if (varnum == 1) {
-      if (isMaster) cout << "Error: No Eclipsefile or stonefiles found on command line." << endl;
-      usageandexit();
-   }
-   */
-
-
-   /* Loop over all command line options in order to look 
-      for options. 
-
-      argidx loops over all the arguments here, and updates the
-      variable 'argeclindex' *if* it finds any legal options,
-      'argeclindex' is so that vararg[argeclindex] = the eclipse
-      filename. If options are illegal, argeclindex will be wrong, 
-      
-   */
-
-   /*
-   int argeclindex = 0;
-   for (int argidx = 1; argidx < varnum; argidx += 2)  {
-       if (string(vararg[argidx]).substr(0,1) == "-")    {
-           string searchfor = string(vararg[argidx]).substr(1); // Chop off leading '-'
-           // Check if it is a match 
-           if (options.count(searchfor) == 1) {
-               options[searchfor] = string(vararg[argidx+1]);
-               if (isMaster) cout << "Parsed command line option: " << searchfor << " := " << vararg[argidx+1] << endl;
-               argeclindex = argidx + 2;
-           }
-           else {
-               if (isMaster) cout << "Option -" << searchfor << " unrecognized." << endl;
-               usageandexit();
-           }
-       }
-       else { 
-           // if vararg[argidx] does not start in '-', 
-           // assume we have found the position of the Eclipse-file.
-           argeclindex = argidx;
-           break; // out of for-loop, 
-       }
-   }
-   */
      
    // What fluid system are we dealing with? (oil/water or gas/oil)
    bool owsystem;
@@ -404,26 +291,11 @@ int main(int varnum, char** vararg)
        usageandexit();
    }
 
-   // argeclindex should now point to the eclipse file
-   //static char* ECLIPSEFILENAME(vararg[argeclindex]);
-   //argeclindex += 1; // argeclindex jumps to next input argument, now it points to the stone files.
-
    // Boolean set to true if input permeability in eclipse-file has diagonal anisotropy.
    // (full-tensor anisotropy will be ignored)
    bool anisotropic_input = false;
    
-   // argeclindex now points to the first J-function. This index is not
-   // to be touched now.
-   //static int rockfileindex = argeclindex;
-   
-
-   /* Check if at least one J-function is supplied on command line 
-   if (varnum <= rockfileindex) {
-       if (isMaster) cerr << "Error: No J-functions found on command line." << endl;
-       usageandexit();
-   }
-   */
-    
+  
    /* Check validity of boundary conditions chosen, and make booleans 
       for boundary conditions, this allows more readable code later. */
    bool isFixed, isLinear, isPeriodic; 
@@ -465,15 +337,6 @@ int main(int varnum, char** vararg)
    // Read data from the Eclipse file and 
    // populate our vectors with data from the file
   
-   /*
-   // Test if filename exists and is readable
-   ifstream eclipsefile(ECLIPSEFILENAME, ios::in);
-   if (eclipsefile.fail()) {
-       if (isMaster) cerr << "Error: Filename " << ECLIPSEFILENAME << " not found or not readable." << endl;
-       usageandexit();
-   }
-   eclipsefile.close(); 
-   */
 
    if (isMaster) cout << "Parsing Eclipse file <" << ECLIPSEFILENAME << "> ... ";
    flush(cout);   start = clock();
@@ -486,28 +349,6 @@ int main(int varnum, char** vararg)
    stringstream gridstream(stringstream::in | stringstream::out);
    gridstream << eclipseInput;
    eclParser.read(gridstream, false);
-   
-   /*
-   // Benchmark, old version (do not work and more complex than previous method):
-   Opm::EclipseGridParser eclParser_new;
-   
-   eclParser_new.setIntegerField("ACTNUM", actnum_vec);
-   eclParser_new.setIntegerField("ROCKTYPE", rocktype_vec);
-   eclParser_new.setFloatingPointField("ZCORN", zcorn_vec);
-   eclParser_new.setFloatingPointField("PORO", poro_vec);
-   eclParser_new.setFloatingPointField("COORD", coord_vec);
-   eclParser_new.setFloatingPointField("PERMX", permx_vec);
-
-   Opm::SPECGRID sg;
-   sg.dimensions = model_dim;
-   Opm::SPECGRID *ptr;
-   ptr = &sg;
-   std::tr1::shared_ptr<Opm::SpecialBase> specgrid_field(new Opm::SPECGRID);
-   specgrid_field = &sg;
-   //Opm::EclipseGridParser::SpecialFieldPtr specgrid_field(ptr);
-   //std::tr1::shared_ptr<Opm::SPECGRID> specgrid_field(ptr);
-   //eclParser_new.setSpecialField("SPECGRID", specgrid_field);
-   */
 
    finish = clock();   timeused = (double(finish)-double(start))/CLOCKS_PER_SEC;
    if (isMaster) cout << " (" << timeused <<" secs)" << endl;
@@ -696,10 +537,7 @@ int main(int varnum, char** vararg)
    const bool includeGravity       = (fabs(gravity) > DBL_MIN); // true for non-zero gravity
    const int outputprecision       = atoi(options["outputprecision"].c_str());
 
-   // Handle two command line input formats, either one J-function for all stone types
-   // or one each. If there is only one stone type, both code blocks below are equivalent.
-
-
+ 
    // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
    stringstream stonestream(stringstream::in | stringstream::out);
    stonestream << stone_string;
@@ -745,155 +583,6 @@ int main(int varnum, char** vararg)
      std::cout.rdbuf(fout.rdbuf());
    }
    
-   /* Original version:
-   if (varnum == rockfileindex + stone_types) {
-      for (int i=0 ; i < stone_types; ++i) {
-	 const char* ROCKFILENAME = vararg[rockfileindex+i];
-         // Check if rock file exists and is readable:
-         ifstream rockfile(ROCKFILENAME, ios::in);
-         if (rockfile.fail()) {
-            if (isMaster) cerr << "Error: Filename " << ROCKFILENAME << " not found or not readable." << endl;
-            usageandexit();
-         }
-         rockfile.close(); 
-         
-         if (! anisotropic_input) {
-             
-             MonotCubicInterpolator Jtmp;
-             try {
-                 Jtmp = MonotCubicInterpolator(ROCKFILENAME, 1, jFunctionCurve); 
-             }
-             catch (const char * errormessage) {
-                 if (isMaster) cerr << "Error: " << errormessage << endl;
-                 if (isMaster) cerr << "Check filename and -jFunctionCurve" << endl;
-                 usageandexit();
-             }
-             
-             // Invert J-function, now we get saturation as a function of pressure:
-             if (Jtmp.isStrictlyMonotone()) {
-                 InvJfunctions.push_back(MonotCubicInterpolator(Jtmp.get_fVector(), Jtmp.get_xVector()));
-                 JfunctionNames.push_back(ROCKFILENAME);
-                 if (upscaleBothPhases) {
-                     Krfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, 2));
-                     Krfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, 3));
-                 }
-                 else {
-                     Krfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, relPermCurve));
-                 }
-             }
-             else {
-                 if (isMaster) cerr << "Error: Jfunction " << i+1 << " in rock file " << ROCKFILENAME << " was not invertible." << endl;
-                 usageandexit();
-             }
-         }
-         else {  // If input is anisotropic, then we are in second mode with different input file format
-             MonotCubicInterpolator Pctmp;
-             try {
-                 Pctmp = MonotCubicInterpolator(ROCKFILENAME, 2, 1);
-             }
-             catch (const char * errormessage) {
-                 if (isMaster) cerr << "Error: " << errormessage << endl;
-                 if (isMaster) cerr << "Check filename and columns 1 and 2 (Pc and " << saturationstring <<")" << endl;
-                 usageandexit();
-             }
-             
-             // Invert Pc(Sw) curve into Sw(Pc):
-              if (Pctmp.isStrictlyMonotone()) {
-                 SwPcfunctions.push_back(MonotCubicInterpolator(Pctmp.get_fVector(), Pctmp.get_xVector()));
-                 JfunctionNames.push_back(ROCKFILENAME);
-                 Krxfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 3));
-                 Kryfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 4));
-                 Krzfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 5));
-                 if (upscaleBothPhases) {
-                     Krxfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 6));
-                     Kryfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 7));
-                     Krzfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 8));
-                 }
-              }
-             else {
-                 if (isMaster) cerr << "Error: Pc(" << saturationstring << ") curve " << i+1 << " in rock file " << ROCKFILENAME << " was not invertible." << endl;
-                 usageandexit();
-             }
-         }
-      } 
-   }
-   // The code below loads the same file once for every rock type in
-   // the file. This is stone_types-1 more than strictly necessary, so
-   // it could have been simplified.
-   else if (varnum == rockfileindex + 1) {
-       const char* ROCKFILENAME = vararg[rockfileindex];
-       // Check if rock file exists and is readable:
-       ifstream rockfile(ROCKFILENAME, ios::in);
-       if (rockfile.fail()) {
-           if (isMaster) cerr << "Error: Filename " << ROCKFILENAME << " not found or not readable." << endl;
-           usageandexit();
-       }
-       rockfile.close(); 
-       if (! anisotropic_input) {
-           MonotCubicInterpolator Jtmp; 
-           try {
-               Jtmp = MonotCubicInterpolator(ROCKFILENAME, 1, jFunctionCurve);
-           }
-           catch (const char * errormessage) {
-               if (isMaster) cerr << "Error: " << errormessage << endl;
-               if (isMaster) cerr << "Check filename and -jFunctionCurve" << endl;
-               usageandexit();
-           }
-           if (Jtmp.isStrictlyMonotone()) {
-               for (int i=0; i < stone_types; ++i) {
-                   // Invert J-function, now we get saturation as a function of pressure:
-                   InvJfunctions.push_back(MonotCubicInterpolator(Jtmp.get_fVector(), Jtmp.get_xVector()));
-                   JfunctionNames.push_back(ROCKFILENAME);
-                   if (upscaleBothPhases) {
-                       Krfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, 2));
-                       Krfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, 3));
-                   }
-                   else {
-                       Krfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 1, relPermCurve));
-                   }
-               }
-           }
-           else {
-               if (isMaster) cerr << "Error: Jfunction " << 1 << " in rock file " << ROCKFILENAME << " was not invertible." << endl;
-               usageandexit();
-           }
-       }
-       else {
-           MonotCubicInterpolator Pctmp;
-           try {
-               Pctmp = MonotCubicInterpolator(ROCKFILENAME, 2, 1);
-           }
-           catch (const char * errormessage) {
-               if (isMaster) cerr << "Error: " << errormessage << endl;
-               if (isMaster) cerr << "Check filename and columns 1 and 2 (Pc and " << saturationstring <<")" << endl;
-               usageandexit();
-           }
-           // Invert Pc(Sw) curve into Sw(Pc):
-           if (Pctmp.isStrictlyMonotone()) {
-               for (int i=0; i < stone_types; ++i) { 
-                   SwPcfunctions.push_back(MonotCubicInterpolator(Pctmp.get_fVector(), Pctmp.get_xVector()));
-                   JfunctionNames.push_back(ROCKFILENAME);
-                   Krxfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 3));
-                   Kryfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 4));
-                   Krzfunctions.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 5));
-                   if (upscaleBothPhases) {
-                       Krxfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 6));
-                       Kryfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 7));
-                       Krzfunctions2.push_back(MonotCubicInterpolator(ROCKFILENAME, 2, 8));
-                   }
-               }
-           }
-           else {
-               if (isMaster) cerr << "Error: Pc(" << saturationstring << ") curve " << 1 << " in rock file " << ROCKFILENAME << " was not invertible." << endl;
-               usageandexit();
-           }           
-       }
-   }
-   else {
-       if (isMaster) cerr << "Error:  Wrong number of stone-functions provided. " << endl;
-       usageandexit();
-   }
-   */
    
    // Check if input relperm curves satisfy Eclipse requirement of specifying critical saturations
    const bool doEclipseCheck = (options["doEclipseCheck"] == "true");
@@ -1966,6 +1655,7 @@ int main(int varnum, char** vararg)
      }
           
      /*
+     // Display results
      dispVec("Pressure", PvaluesReference);
      dispVec("Saturation", WaterSaturationReference);
      dispVec("Relpermx", RelPermValuesReference[0]);
@@ -2082,305 +1772,7 @@ int main(int varnum, char** vararg)
 
      cout << outputtmp.str();    
    
-     //cout << endl << "Original output: " << endl << endl;
-
    }
-   
-
-   /*********************************************************************************
-    *  Step 9
-    *
-    * Output results to stdout and optionally to file. Note, we only output to
-    * file if the '-outputWater'-option and/or '-outputOil' has been set, as this option is an
-    * empty string by default.
-    */
-
-   /*
-   if (isMaster) {
-
-       stringstream outputtmp;
-       
-       // Print a table of all computed values:
-       outputtmp << "######################################################################" << endl;
-       outputtmp << "# Results from upscaling relative permeability."<< endl;
-       outputtmp << "#" << endl;
-#if HAVE_MPI
-       outputtmp << "#          (MPI-version)" << endl;
-#endif
-       time_t now = std::time(NULL);
-       outputtmp << "# Finished: " << asctime(localtime(&now));
-       
-       utsname hostname;   uname(&hostname);
-       outputtmp << "# Hostname: " << hostname.nodename << endl;
-       
-       outputtmp << "#" << endl;
-       outputtmp << "# Eclipse file: " << ECLIPSEFILENAME << endl;
-       outputtmp << "#        cells: " << tesselatedCells << endl;
-       outputtmp << "#  Pore volume: " << poreVolume << endl;
-       outputtmp << "#       volume: " << volume << endl;
-       outputtmp << "#     Porosity: " << poreVolume/volume << endl;
-       outputtmp << "#" << endl;
-       if (! anisotropic_input) {
-           for (int i=0; i < stone_types ; ++i) {
-               outputtmp << "# Stone " << i+1 << ": " << JfunctionNames[i] << " (" << InvJfunctions[i].getSize() << " points)" <<  endl;
-           }
-           outputtmp << "#         jFunctionCurve: " << options["jFunctionCurve"] << endl;
-           if (!upscaleBothPhases) outputtmp << "#           relPermCurve: " << options["relPermCurve"] << endl;
-       }
-       else { // anisotropic input, not J-functions that are supplied on command line (but vector JfunctionNames is still used)
-           for (int i=0; i < stone_types ; ++i) {
-               outputtmp << "# Stone " << i+1 << ": " << JfunctionNames[i] << " (" << Krxfunctions[i].getSize() << " points)" <<  endl;
-           }
-       }
-           
-       outputtmp << "#" << endl;
-       outputtmp << "# Timings:   Tesselation: " << timeused_tesselation << " secs" << endl;
-       outputtmp << "#              Upscaling: " << timeused_upscale_wallclock << " secs";
-#ifdef HAVE_MPI
-       outputtmp << " (wallclock time)" << endl;
-       outputtmp << "#                         " << avg_upscaling_time_pr_point << " secs pr. saturation point" << endl;
-       outputtmp << "#              MPI-nodes: " << mpi_nodecount << endl;
-
-       // Single phase upscaling time is included here, in possibly a hairy way.
-       double speedup = (avg_upscaling_time_pr_point * (points + 1) + timeused_tesselation)/(timeused_upscale_wallclock + avg_upscaling_time_pr_point + timeused_tesselation);
-       outputtmp << "#                Speedup: " << speedup << ", efficiency: " << speedup/mpi_nodecount << endl;
-#else
-       outputtmp << ", " << avg_upscaling_time_pr_point << " secs avg for " << points << " runs" << endl;
-#endif
-       outputtmp << "# " << endl;
-       outputtmp << "# Options used:" << endl;
-       outputtmp << "#     Boundary conditions: ";
-       if (isFixed)    outputtmp << "Fixed (no-flow)" << endl;
-       if (isPeriodic) outputtmp << "Periodic" << endl;
-       if (isLinear)   outputtmp << "Linear" << endl;
-       outputtmp << "#                  points: " << options["points"] << endl;
-       outputtmp << "#         maxPermContrast: " << options["maxPermContrast"] << endl;
-       outputtmp << "#                 minPerm: " << options["minPerm"] << endl;
-       outputtmp << "#                 minPoro: " << options["minPoro"] << endl;
-       outputtmp << "#          surfaceTension: " << options["surfaceTension"] << " dynes/cm" << endl;
-       if (includeGravity) {
-           outputtmp << "#                 gravity: " << options["gravity"] << " m/s²" << endl;
-           if (owsystem) outputtmp << "#            waterDensity: " << options["waterDensity"] << " g/cm³" << endl;
-           else outputtmp << "#              gasDensity: " << options["waterDensity"] << " g/cm³" << endl;
-           outputtmp << "#              oilDensity: " << options["oilDensity"] << " g/cm³" << endl;
-       }
-       else {
-           outputtmp << "#                 gravity: 0" << endl;
-       }
-       if (doInterpolate) {
-           outputtmp << "#             interpolate: " << options["interpolate"] << " points" << endl;
-       }
-       outputtmp << "# " << endl;
-       outputtmp << "# Single phase permeability" << endl; 
-       outputtmp << "#  |Kxx  Kxy  Kxz| = " << permTensor(0,0) << "  " << permTensor(0,1) << "  " << permTensor(0,2) << endl; 
-       outputtmp << "#  |Kyx  Kyy  Kyz| = " << permTensor(1,0) << "  " << permTensor(1,1) << "  " << permTensor(1,2) << endl; 
-       outputtmp << "#  |Kzx  Kzy  Kzz| = " << permTensor(2,0) << "  " << permTensor(2,1) << "  " << permTensor(2,2) << endl; 
-       outputtmp << "# " << endl;
-       if (doInterpolate) {
-           outputtmp << "# NB: Data points shown are interpolated." << endl;
-       }
-       outputtmp << "######################################################################" << endl;
-       if (upscaleBothPhases) {
-           string phase1, phase2;
-           if (owsystem) phase1="w"; else phase1="g";
-           phase2="o";
-           if (isFixed) { 
-               outputtmp << "#  Pc (Pa)        " << saturationstring << "           Kr" << phase1 << "xx       Kr" << phase1 << "yy       Kr" << phase1 << "zz" 
-                         <<  "       Kr" << phase2 << "xx       Kr" << phase2 << "yy       Kr" << phase2 << "zz" <<  endl; 
-           } 
-           else if (isPeriodic || isLinear) { 
-               outputtmp << "#  Pc (Pa)        " << saturationstring << "           Kr" << phase1 << "xx       Kr" << phase1 << "yy       Kr" << phase1 << "zz       Kr" 
-                         << phase1 << "yz       Kr" << phase1 << "xz       Kr" << phase1 << "xy       Kr" << phase1 << "zy       Kr" << phase1 << "zx       Kr" << phase1 << "yx" 
-                         << "       Kr" << phase2 << "xx       Kr" << phase2 << "yy       Kr" << phase2 << "zz       Kr" 
-                         << phase2 << "yz       Kr" << phase2 << "xz       Kr" << phase2 << "xy       Kr" << phase2 << "zy       Kr" << phase2 << "zx       Kr" << phase2 << "yx" << endl;
-           }
-       }
-       else {
-           if (isFixed) { 
-               outputtmp << "#  Pc (Pa)        " << saturationstring << "            Krxx        Kryy        Krzz" << endl; 
-           } 
-           else if (isPeriodic || isLinear) { 
-               outputtmp << "#  Pc (Pa)        " << saturationstring << "            Krxx        Kryy        Krzz        Kryz        Krxz        Krxy        Krzy        Krzx        Kryx" << endl;
-           }
-       }
-       
-       vector<double> Pvalues = pressurePoints; //WaterSaturation.get_xVector(); 
-       vector<double> Satvalues = WaterSaturation; //.get_fVector(); 
-       
-       // If user wants interpolated output, do monotone cubic interpolation
-       // by modifying the data vectors that are to be printed
-       if (doInterpolate) {
-           // Find min and max for saturation values
-           double xmin = +DBL_MAX;
-           double xmax = -DBL_MAX;
-           for (unsigned int i = 0; i < Satvalues.size(); ++i) {
-               if (Satvalues[i] < xmin) {
-                   xmin = Satvalues[i];
-               }
-               if (Satvalues[i] > xmax) {
-                   xmax = Satvalues[i];
-               }
-           }
-           // Make uniform grid in saturation axis
-           vector<double> SatvaluesInterp;
-           for (int i = 0; i < interpolationPoints; ++i) {
-               SatvaluesInterp.push_back(xmin + ((double)i)/((double)interpolationPoints-1)*(xmax-xmin));
-           }
-           // Now capillary pressure and computed relperm-values must be viewed as functions
-           // of saturation, and then interpolated on the uniform saturation grid.
-           
-           // Now overwrite existing Pvalues and relperm-data with interpolated data:
-           MonotCubicInterpolator PvaluesVsSaturation(Satvalues, Pvalues);
-           Pvalues.clear();
-           for (int i = 0; i < interpolationPoints; ++i) {
-               Pvalues.push_back(PvaluesVsSaturation.evaluate(SatvaluesInterp[i]));
-           }
-           for (int voigtIdx = 0; voigtIdx < tensorElementCount; ++voigtIdx) {
-               MonotCubicInterpolator RelPermVsSaturation(Satvalues, RelPermValues[voigtIdx]);
-               RelPermValues[voigtIdx].clear();
-               for (int i=0; i < interpolationPoints; ++i) {
-                   RelPermValues[voigtIdx].push_back(RelPermVsSaturation.evaluate(SatvaluesInterp[i]));
-               }
-           }
-           if (upscaleBothPhases) {
-               for (int voigtIdx = 0; voigtIdx < tensorElementCount; ++voigtIdx) {
-                   MonotCubicInterpolator RelPermVsSaturation(Satvalues, RelPermValues2[voigtIdx]);
-                   RelPermValues2[voigtIdx].clear();
-                   for (int i=0; i < interpolationPoints; ++i) {
-                       RelPermValues2[voigtIdx].push_back(RelPermVsSaturation.evaluate(SatvaluesInterp[i]));
-                   }
-               }
-           }
-           
-           // Now also overwrite Satvalues
-           Satvalues.clear();
-           Satvalues = SatvaluesInterp;
-       }
-       
-       // The code below does not care whether the data is interpolated or not.
-       const int fieldwidth = outputprecision + 8;
-       for (unsigned int i=0; i < Satvalues.size(); ++i) {
-           outputtmp << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Pvalues[i]; 
-           outputtmp << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Satvalues[i]; 
-           
-           for (int voigtIdx = 0; voigtIdx < tensorElementCount; ++voigtIdx) { 
-               outputtmp << showpoint << setw(fieldwidth) << setprecision(outputprecision) 
-                         << RelPermValues[voigtIdx][i]; 
-           } 
-           if (upscaleBothPhases) {
-               for (int voigtIdx = 0; voigtIdx < tensorElementCount; ++voigtIdx) { 
-                   outputtmp << showpoint << setw(fieldwidth) << setprecision(outputprecision) 
-                             << RelPermValues2[voigtIdx][i]; 
-               } 
-           }
-           outputtmp << endl; 
-           
-       }
-       
-       cout << outputtmp.str();
-       
-       if (options["output"] != "") {
-           cout << "Writing results to " << options["output"] << endl;
-           ofstream outfile;
-           outfile.open(options["output"].c_str(), ios::out | ios::trunc);
-           outfile << outputtmp.str();
-           outfile.close();      
-       }
-       
-       // If both phases are upscaled and output is specyfied, create SWOF or SGOF files for Eclipse
-       if (options["output"] != "" && upscaleBothPhases) {
-           // krow(swirr)-values if given
-           double krowxswirr = atof(options["krowxswirr"].c_str());
-           double krowyswirr = atof(options["krowyswirr"].c_str());
-           double krowzswirr = atof(options["krowzswirr"].c_str());
-
-           stringstream swofx, swofy, swofz;
-           string satstringCap = ""; if (owsystem) satstringCap = "W"; else satstringCap = "G"; 
-           string satstring = ""; if (owsystem) satstring = "w"; else satstring = "g"; 
-           // x-direction
-           swofx << "-- This file is based on the results in " << endl 
-                 << "-- " << options["output"] << endl
-                 << "-- for relperm in x-direction." << endl
-                 << "-- Pressure values (Pc) given in bars." << endl
-                 << "--        S" << satstring << "       Kr" << satstring << "xx      Kro" << satstring << "xx      Pc(bar)" << endl
-                 << "--S" << satstringCap << "OF" << endl;
-           if (krowxswirr > 0){
-               swofx << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << krowxswirr
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0 << endl;
-           }
-           for (unsigned int i=0; i < Satvalues.size(); ++i) {
-               swofx << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Satvalues[i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues[0][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues2[0][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Pvalues[i]/100000.0 << endl;
-           }
-           swofx << "/" << endl;
-           // y-direction
-           swofy << "-- This file is based on the results in " << endl 
-                 << "-- " << options["output"] << endl
-                 << "-- for relperm in y-direction." << endl
-                 << "-- Pressure values (Pc) given in bars." << endl
-                 << "--        S" << satstring << "       Kr" << satstring << "yy      Kro" << satstring << "yy      Pc(bar)" << endl
-                 << "--S" << satstringCap << "OF" << endl;
-           if (krowyswirr > 0){
-               swofy << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << krowyswirr
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0 << endl;
-           }
-           for (unsigned int i=0; i < Satvalues.size(); ++i) {
-               swofy << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Satvalues[i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues[1][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues2[1][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Pvalues[i]/100000.0 << endl;
-           }
-           swofy << "/" << endl;
-           // z-direction
-           swofz << "-- This file is based on the results in " << endl 
-                 << "-- " << options["output"] << endl
-                 << "-- for relperm in z-direction." << endl
-                 << "-- Pressure values (Pc) given in bars." << endl
-                 << "--        S" << satstring << "       Kr" << satstring << "zz      Kro" << satstring << "zz      Pc(bar)" << endl
-                 << "--S" << satstringCap << "OF" << endl;
-           if (krowzswirr > 0){
-               swofz << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << krowzswirr
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << 0 << endl;
-           }
-           for (unsigned int i=0; i < Satvalues.size(); ++i) {
-               swofz << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Satvalues[i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues[2][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << RelPermValues2[2][i]
-                     << showpoint << setw(fieldwidth) << setprecision(outputprecision) << Pvalues[i]/100000.0 << endl;
-           }
-           swofz << "/" << endl;
-           //cout << swofx.str() << endl;
-           //cout << swofy.str() << endl;
-           //cout << swofz.str() << endl;
-           ofstream xfile, yfile, zfile;
-           string opfname = options["output"];
-           string fnbase = opfname.substr(0,opfname.find_first_of('.'));
-           string xfilename = fnbase + "-x.S" + satstringCap + "OF";
-           string yfilename = fnbase + "-y.S" + satstringCap + "OF";
-           string zfilename = fnbase + "-z.S" + satstringCap + "OF";
-           
-           cout << "Writing Eclipse compatible files to " << xfilename << ", " << yfilename << " and " << zfilename << endl;
-           xfile.open(xfilename.c_str(), ios::out | ios::trunc);
-           xfile << swofx.str();
-           xfile.close();
-           yfile.open(yfilename.c_str(), ios::out | ios::trunc);
-           yfile << swofy.str();
-           yfile.close();
-           zfile.open(zfilename.c_str(), ios::out | ios::trunc);
-           zfile << swofz.str();
-           zfile.close();
-       }
-
-   }
-   */
    
 
 #if HAVE_MPI
