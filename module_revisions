@@ -3,7 +3,7 @@
 
 # DUNE modules from SVN (stable 2.2 release)
 # Command: svn co -r <revision> https://svn.dune-project.org/svn/<modulename>/branches/release-2.2 <modulename>
-dune-common: 6873
+dune-common: 6815
 dune-geometry: 113
 dune-grid: 8252
 dune-istl: 1639
