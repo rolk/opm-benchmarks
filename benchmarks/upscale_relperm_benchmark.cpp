@@ -126,7 +126,7 @@ char model_name[] = "Large";
 #endif
 
 // Define tolerance to be used when comparing results. 
-double tolerance = 1e-10;
+double tolerance = 1e-8;
 
 using namespace Dune;
 using namespace std;
