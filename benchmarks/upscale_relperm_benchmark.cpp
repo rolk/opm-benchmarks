@@ -1734,7 +1734,7 @@ int main(int varnum, char** vararg)
      outputtmp << "Model size:       ~" << model_size/1000000 << " MB" << endl;
      outputtmp << "Upscaling points: " << points << endl;
      // outputtmp << "Stone file:       " << JfunctionNames[1] << endl;
-     outputtmp << "The size should be larger than cache memory to avoid cache effects.\n"
+     outputtmp << "Differen model sizes are available, change model type to increase the size.\n"
        "Model type can be changed by editing macro 'MODEL_TYPE' in source file." << endl;
 
 #ifdef HAVE_MPI
