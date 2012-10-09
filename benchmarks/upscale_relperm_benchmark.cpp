@@ -110,15 +110,19 @@
 #include <dune/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model:
-//   - Small: MODEL_TYPE 0  (175045 active cells, ~23 MB)
-//   - Large: MODEL_TYPE 1  (711539 active cells, ~93 MB) 
+//   - Small: MODEL_TYPE 0  (35751 active cells, ~5 MB)
+//   - Medium: MODEL_TYPE 1  (175045 active cells, ~23 MB)
+//   - Large: MODEL_TYPE 2  (711539 active cells, ~93 MB) 
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
-#include <input/benchmark75_input_data.cpp>
+#include <input/benchmark20_input_data.cpp>
 char model_name[] = "Small";
 #elif MODEL_TYPE == 1
+#include <input/benchmark75_input_data.cpp>
+char model_name[] = "Medium";
+#elif MODEL_TYPE == 2
 #include <input/benchmark150_input_data.cpp>
 char model_name[] = "Large";
 #else
