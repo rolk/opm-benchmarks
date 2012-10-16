@@ -1,73 +1,58 @@
-Preparing the Sources
-=========================
+These are the release notes for opm-benchmarks
 
-Additional to the software mentioned in README you'll need the
-following programs installed on your system:
+Opm-benchmarks currently consists of one benchmark with three included data sets.
+It is the mpi version of the upscale_relperm code from opm-upscaling, and can
+distribute to a maximum of twenty cpus in it's current form. The benhcmark is
+copyrighted by Statoil, and licensed under GPL 3+. See COPYING for details.
 
-  automake >= 1.5
+ON WHAT PLATFORMS DOES IT RUN?
+It is only developed for GNU/Linux. All the larger distributions are
+usually tested.
 
-  autoconf >= 2.50
+HOW MUCH MEMORY DO I NEED?
+The benchmark itself uses just over 100MB per process on the smallest data set.
+Compiling the benchmark is quite memory intensive. Plan for at least one gigabyte
+of available memory for each thread when compiling. Number of threads is given
+with the -j option in the opme-benchmarks/config.opts file.
 
-  libtool
+BUILDING AND RUNNING THE BENCHMARK
+#!/bin/bash
+# This script downloads all necessary source code, build the DUNE and OPM modules and finally run the benchmark
 
-Getting started
----------------
+######################################################
+# Obtain source code
+######################################################
 
-If these preliminaries are met, you should run 
+# Make new directory to store all source code and module libraries mkdir OPM cd OPM
 
-  dunecontrol all
+# Checkout DUNE core modules from SVN (stable 2.2 release) svn co https://svn.dune-project.org/svn/dune-common/branches/release-2.2
+dune-common
+svn co
+https://svn.dune-project.org/svn/dune-geometry/branches/release-2.2
+dune-geometry
+svn co https://svn.dune-project.org/svn/dune-grid/branches/release-2.2
+dune-grid
+svn co https://svn.dune-project.org/svn/dune-istl/branches/release-2.2
+dune-istl
 
-which will find all installed dune modules as well as all dune modules 
-(not installed) which sources reside in a subdirectory of the current 
-directory. Note that if dune is not installed properly you will either
-have to add the directory where the dunecontrol script resides (probably 
-./dune-common/bin) to your path or specify the relative path of the script.
-
-On your project and all uninstalled DUNE source modules found the script 
-will then calls the GNU autoconf/automake to create a ./configure-script 
-and the Makefiles. Afterwards that configure script will be called and the
-modules will be build using make all
-
-Most probably you'll have to provide additional information to dunecontrol 
-(e. g. compilers, configure options) and/or make options. 
-
-The most convenient way is to use options files in this case. The files
-defining three variables:
-
-AUTOGEN_FLAGS    flags passed to autogen
-CONFIGURE_FLAGS  flags passed to configure
-MAKE_FLAGS       flags passed to make
-
-An example options file might look like this:
-
-#use this options to autogen, configure and make if no other options are given
-AUTOGEN_FLAGS="--ac=2.50 --ac=1.8" #Forces automake 2,50 and autoconf 1.8
-CONFIGURE_FLAGS="CXX=g++-3.4 --prefix=/install/path" #force g++-3.4 as compiler
-MAKE_FLAGS=install #Per default run make install instead of simply make
-
-If you save this information into example.opts you can path the opts file to
-dunecontrol via the --opts option, e. g.
-
-  dunecontrol --opts=example.opts all
-
-To get a full list of available configure flags just run
-
-  dunecontrol configure --help
-
-after running at least 
-  dunecontrol autogen
-
-More info
----------
-
-See
-
-     dunecontrol --help
-   
-for further options.
+# Clone OPM modules
+git clone https://github.com/OPM/opm-core.git
+git clone https://github.com/OPM/opm-porsol.git
+git clone https://github.com/OPM/opm-upscaling.git
+git clone https://github.com/OPM/dune-cornerpoint.git
+git clone https://github.com/OPM/opm-benchmarks.git
 
 
-The full build-system is described in the dune-common/doc/buildsystem (SVN version) or under share/doc/dune-common/buildsystem if you installed DUNE!
+######################################################
+# Build from source
+######################################################
 
-$Id: duneproject 6399 2011-03-18 16:05:35Z mblatt $
+nice dune-common/bin/dunecontrol --opts=opm-benchmarks/config.opts all # You may want to edit the config.opts file
 
+
+######################################################
+# Run benchmark
+######################################################
+
+nice mpirun -np 4 ./opm-benchmarks/benchmarks/upscale_relperm_benchmark
+# You may want to change the number of processors
