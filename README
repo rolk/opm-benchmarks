@@ -17,7 +17,8 @@ with the -j option in the opme-benchmarks/config.opts file.
 
 BUILDING AND RUNNING THE BENCHMARK
 #!/bin/bash
-# This script downloads all necessary source code, build the DUNE and OPM modules and finally run the benchmark
+# This script downloads all necessary source code, build the DUNE and OPM modules
+# and finally run the benchmark
 
 ######################################################
 # Obtain source code
@@ -25,15 +26,11 @@ BUILDING AND RUNNING THE BENCHMARK
 
 # Make new directory to store all source code and module libraries mkdir OPM cd OPM
 
-# Checkout DUNE core modules from SVN (stable 2.2 release) svn co https://svn.dune-project.org/svn/dune-common/branches/release-2.2
-dune-common
-svn co
-https://svn.dune-project.org/svn/dune-geometry/branches/release-2.2
-dune-geometry
-svn co https://svn.dune-project.org/svn/dune-grid/branches/release-2.2
-dune-grid
-svn co https://svn.dune-project.org/svn/dune-istl/branches/release-2.2
-dune-istl
+# Checkout DUNE core modules from SVN (stable 2.2 release)
+svn co https://svn.dune-project.org/svn/dune-common/branches/release-2.2 dune-common
+svn co https://svn.dune-project.org/svn/dune-geometry/branches/release-2.2 dune-geometry
+svn co https://svn.dune-project.org/svn/dune-grid/branches/release-2.2 dune-grid
+svn co https://svn.dune-project.org/svn/dune-istl/branches/release-2.2 dune-istl
 
 # Clone OPM modules
 git clone https://github.com/OPM/opm-core.git
