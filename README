@@ -13,7 +13,7 @@ HOW MUCH MEMORY DO I NEED?
 The benchmark itself uses just over 100MB per process on the smallest data set.
 Compiling the benchmark is quite memory intensive. Plan for at least one gigabyte
 of available memory for each thread when compiling. Number of threads is given
-with the -j option in the opme-benchmarks/config.opts file.
+with the -j option in the opm-benchmarks/config.opts file.
 
 BUILDING AND RUNNING THE BENCHMARK
 #!/bin/bash
