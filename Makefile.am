@@ -3,7 +3,7 @@
 # we need the module file to be able to build via dunecontrol
 EXTRA_DIST=dune.module
 
-SUBDIRS = benchmarks m4 dune doc
+SUBDIRS = benchmarks m4 opm doc
 
 if BUILD_DOCS
 # TODO: set up documentation tree automatically

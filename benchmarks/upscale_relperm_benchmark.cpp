@@ -107,7 +107,7 @@
 #endif
 
 #include <opm/core/utility/MonotCubicInterpolator.hpp>
-#include <dune/upscaling/SinglePhaseUpscaler.hpp>
+#include <opm/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model:
 //   - Small: MODEL_TYPE 0  (35751 active cells, ~5 MB)
@@ -132,7 +132,7 @@ char model_name[] = "Large";
 // Define tolerance to be used when comparing results. 
 double tolerance = 1e-4;
 
-using namespace Dune;
+using namespace Opm;
 using namespace std;
 
 // Function for displaying a vector. Used for testing purposes
@@ -539,7 +539,7 @@ int main(int varnum, char** vararg)
    const double waterDensity       = atof(options["waterDensity"].c_str());
    const double oilDensity         = atof(options["oilDensity"].c_str());
    const bool includeGravity       = (fabs(gravity) > DBL_MIN); // true for non-zero gravity
-   const int outputprecision       = atoi(options["outputprecision"].c_str());
+   //const int outputprecision       = atoi(options["outputprecision"].c_str());
 
  
    // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
@@ -912,7 +912,7 @@ int main(int varnum, char** vararg)
    double Sworvolume = 0;
    // cell_idx is the eclipse index.
    const std::vector<int>& ecl_idx = upscaler.grid().globalCell();
-   CpGrid::Codim<0>::LeafIterator c = upscaler.grid().leafbegin<0>();
+   Dune::CpGrid::Codim<0>::LeafIterator c = upscaler.grid().leafbegin<0>();
    for (; c != upscaler.grid().leafend<0>(); ++c) {
        unsigned int cell_idx = ecl_idx[c->index()];
        if (satnums[cell_idx] > 0) { // Satnum zero is "no rock"

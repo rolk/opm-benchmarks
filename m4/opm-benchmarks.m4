@@ -13,5 +13,5 @@ AC_DEFUN([OPM_BENCHMARKS_CHECKS])
 # not by opm-benchmarks itself
 AC_DEFUN([OPM_BENCHMARKS_CHECK_MODULE],
 [
-  DUNE_CHECK_MODULES([opm-benchmarks],[opm_benchmarks/opm_benchmarks.hh])
+  OPM_PORSOL_MODULES([opm-benchmarks],[opm/benchmarks/opm_benchmarks.hh])
 ])

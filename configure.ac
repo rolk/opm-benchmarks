@@ -33,8 +33,8 @@ AC_CONFIG_FILES([
   doc/Makefile
   doc/doxygen/Makefile
   doc/doxygen/Doxyfile
-  dune/Makefile
-  dune/opm_benchmarks/Makefile
+  opm/Makefile
+  opm/benchmarks/Makefile
   m4/Makefile
   opm-benchmarks.pc
 ])
