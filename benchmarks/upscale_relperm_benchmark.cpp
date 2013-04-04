@@ -117,13 +117,13 @@
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
-#include <input/benchmark20_input_data.cpp>
+#include "input/benchmark20_input_data.cpp"
 char model_name[] = "Small";
 #elif MODEL_TYPE == 1
-#include <input/benchmark75_input_data.cpp>
+#include "input/benchmark75_input_data.cpp"
 char model_name[] = "Medium";
 #elif MODEL_TYPE == 2
-#include <input/benchmark150_input_data.cpp>
+#include "input/benchmark150_input_data.cpp"
 char model_name[] = "Large";
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
