@@ -206,12 +206,11 @@ int main(int varnum, char** vararg)
 
    // Suppress output in benchmark version (both cout and cerr):
    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
-   std::ofstream fout("/dev/null");
-   std::cout.rdbuf(fout.rdbuf()); // redirect 'cout' to a 'fout'
+   stringstream ss_null; // Stringstream to redirect all unwanted output
+   std::cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
    
    std::streambuf* cerr_sbuf = std::cerr.rdbuf();
-   std::ofstream ferr("/dev/null");
-   std::cerr.rdbuf(ferr.rdbuf());
+   std::cerr.rdbuf(ss_null.rdbuf());
 
    // Variables used for timing/profiling:
    clock_t start, finish;
@@ -578,15 +577,6 @@ int main(int varnum, char** vararg)
      }
      JfunctionNames.push_back(ROCKFILENAME);
    }
-
-   // Display progress
-   if (isMaster) {
-     std::cout.rdbuf(cout_sbuf);
-     for (int i=0; i < (points +1); ++i) cout << "_";
-     cout << endl;
-     std::cout.rdbuf(fout.rdbuf());
-   }
-   
    
    // Check if input relperm curves satisfy Eclipse requirement of specifying critical saturations
    const bool doEclipseCheck = (options["doEclipseCheck"] == "true");
@@ -1152,10 +1142,6 @@ int main(int varnum, char** vararg)
        permTensor = upscaler.upscaleSinglePhase();
        permTensorInv = permTensor;
        invert(permTensorInv);
-
-       std::cout.rdbuf(cout_sbuf);
-       cout << "*";
-       std::cout.rdbuf(fout.rdbuf());
    }
 
   
@@ -1433,9 +1419,6 @@ int main(int varnum, char** vararg)
                }
            } 
            cout << endl;
-	   std::cout.rdbuf(cout_sbuf);
-	   cout << "*";
-	   std::cout.rdbuf(fout.rdbuf());
        }
    }
    
