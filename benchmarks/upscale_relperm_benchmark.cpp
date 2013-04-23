@@ -110,23 +110,27 @@
 #include <opm/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model:
-//   - Small: MODEL_TYPE 0  (35751 active cells, ~5 MB)
-//   - Medium: MODEL_TYPE 1  (175045 active cells, ~23 MB)
-//   - Large: MODEL_TYPE 2  (711539 active cells, ~93 MB) 
+//   - Debug: MODEL_TYPE 0 (1138 active cells, <0 MB)
+//   - Small: MODEL_TYPE 1  (35751 active cells, ~5 MB)
+//   - Medium: MODEL_TYPE 2  (175045 active cells, ~23 MB)
+//   - Large: MODEL_TYPE 3  (711539 active cells, ~93 MB) 
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
+#include "input/benchmark_tiny_input_data.cpp"
+char model_name[] = "Debug";
+#elif MODEL_TYPE == 1
 #include "input/benchmark20_input_data.cpp"
 char model_name[] = "Small";
-#elif MODEL_TYPE == 1
+#elif MODEL_TYPE == 2
 #include "input/benchmark75_input_data.cpp"
 char model_name[] = "Medium";
-#elif MODEL_TYPE == 2
+#elif MODEL_TYPE == 3
 #include "input/benchmark150_input_data.cpp"
 char model_name[] = "Large";
 #else
-#error The macro 'MODEL_TYPE' is invalid. Possible values are 0 (small) and 1 (large).
+#error The macro 'MODEL_TYPE' is invalid. Possible values are 0-3.
 #endif
 
 // Define tolerance to be used when comparing results. 
