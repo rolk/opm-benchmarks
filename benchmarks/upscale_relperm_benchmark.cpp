@@ -207,6 +207,9 @@ void setVoigtValue(SinglePhaseUpscaler::permtensor_t& K, int voigt_idx, double v
 int main(int varnum, char** vararg)
 {
 
+    // Print start-up message
+    cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
+
     // Suppress output in benchmark version (both cout and cerr):
     streambuf* cout_sbuf = cout.rdbuf(); // save original sbuf
     stringstream ss_null; // Stringstream to redirect all unwanted output
