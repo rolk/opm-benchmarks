@@ -177,8 +177,8 @@ double getVoigtValue(const SinglePhaseUpscaler::permtensor_t& K, int voigt_idx)
     case 7: return K.data()[6];
     case 8: return K.data()[3];
     default:
-	cout << "Voigt index out of bounds (only 0-8 allowed)" << endl;
-	throw exception();
+	std::cout << "Voigt index out of bounds (only 0-8 allowed)" << std::endl;
+	throw std::exception();
     }
 }
 
@@ -198,8 +198,8 @@ void setVoigtValue(SinglePhaseUpscaler::permtensor_t& K, int voigt_idx, double v
     case 7: K.data()[6] = val; break;
     case 8: K.data()[3] = val; break;
     default:
-	cout << "Voigt index out of bounds (only 0-8 allowed)" << endl;
-	throw exception();
+	std::cout << "Voigt index out of bounds (only 0-8 allowed)" << std::endl;
+	throw std::exception();
     }
 }
 
@@ -211,12 +211,12 @@ int main(int varnum, char** vararg)
     cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
 
     // Suppress output in benchmark version (both cout and cerr):
-    streambuf* cout_sbuf = cout.rdbuf(); // save original sbuf
+    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
     stringstream ss_null; // Stringstream to redirect all unwanted output
-    cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
+    std::cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
 
-    streambuf* cerr_sbuf = cerr.rdbuf();
-    cerr.rdbuf(ss_null.rdbuf());
+    std::streambuf* cerr_sbuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(ss_null.rdbuf());
 
     // Variables used for timing/profiling:
     clock_t start, finish;
@@ -518,16 +518,16 @@ int main(int varnum, char** vararg)
     int stone_types = int(*(max_element(satnums.begin(), satnums.end())));
 
     // If isotropic input && J-function scaling active
-    vector<MonotCubicInterpolator> InvJfunctions; // Holds the inverse of the loaded J-functions.
-    vector<MonotCubicInterpolator> Krfunctions; // Holds relperm-curves for phase 1 for each stone type
-    vector<MonotCubicInterpolator> Krfunctions2; // Holds relperm-curves for phase 2 for each stone type
+    std::vector<MonotCubicInterpolator> InvJfunctions; // Holds the inverse of the loaded J-functions.
+    std::vector<MonotCubicInterpolator> Krfunctions; // Holds relperm-curves for phase 1 for each stone type
+    std::vector<MonotCubicInterpolator> Krfunctions2; // Holds relperm-curves for phase 2 for each stone type
 
 
     // If anisotropic input
-    vector<MonotCubicInterpolator> SwPcfunctions; // Holds Sw(Pc) for each rocktype.
-    vector<MonotCubicInterpolator> Krxfunctions, Kryfunctions, Krzfunctions, Krxfunctions2, Kryfunctions2, Krzfunctions2;
+    std::vector<MonotCubicInterpolator> SwPcfunctions; // Holds Sw(Pc) for each rocktype.
+    std::vector<MonotCubicInterpolator> Krxfunctions, Kryfunctions, Krzfunctions, Krxfunctions2, Kryfunctions2, Krzfunctions2;
 
-    vector<string> JfunctionNames; // Placeholder for the names of the loaded J-functions.
+    std::vector<string> JfunctionNames; // Placeholder for the names of the loaded J-functions.
 
     // This decides whether we are upscaling water or oil relative permeability
     const int relPermCurve = atoi(options["relPermCurve"].c_str());
@@ -831,11 +831,11 @@ int main(int varnum, char** vararg)
 	for (unsigned int cellIdx = 0; cellIdx < satnums.size(); ++cellIdx) {
 	    int i,j,k; // Position of cell in cell hierarchy
 	    vector<int> zIndices(8,0); // 8 corners with 8 heights
-	    int horIdx = (cellIdx+1) - int(floor(((double)(cellIdx+1))/((double)(x_res*y_res))))*x_res*y_res; // index in the corresponding horizon
+	    int horIdx = (cellIdx+1) - int(std::floor(((double)(cellIdx+1))/((double)(x_res*y_res))))*x_res*y_res; // index in the corresponding horizon
 	    if (horIdx == 0) {
 		horIdx = x_res*y_res;
 	    }
-	    i = horIdx - int(floor(((double)horIdx)/((double)x_res)))*x_res;
+	    i = horIdx - int(std::floor(((double)horIdx)/((double)x_res)))*x_res;
 	    if (i == 0) {
 		i = x_res;
 	    }
@@ -907,7 +907,7 @@ int main(int varnum, char** vararg)
     double Swirvolume = 0;
     double Sworvolume = 0;
     // cell_idx is the eclipse index.
-    const vector<int>& ecl_idx = upscaler.grid().globalCell();
+    const std::vector<int>& ecl_idx = upscaler.grid().globalCell();
     Dune::CpGrid::Codim<0>::LeafIterator c = upscaler.grid().leafbegin<0>();
     for (; c != upscaler.grid().leafend<0>(); ++c) {
 	unsigned int cell_idx = ecl_idx[c->index()];
@@ -964,10 +964,10 @@ int main(int varnum, char** vararg)
     }
 
     // Total porevolume and total volume -> upscaled porosity:
-    double poreVolume = accumulate(cellPoreVolumes.begin(),
+    double poreVolume = std::accumulate(cellPoreVolumes.begin(),
 					cellPoreVolumes.end(),
 					0.0);
-    double volume = accumulate(cellVolumes.begin(),
+    double volume = std::accumulate(cellVolumes.begin(),
 				    cellVolumes.end(),
 				    0.0);
 
@@ -1047,7 +1047,7 @@ int main(int varnum, char** vararg)
 	}
 
 	// Check for saneness of Ptestvalue:
-	if (isnan(Ptestvalue) || isinf(Ptestvalue)) {
+	if (std::isnan(Ptestvalue) || std::isinf(Ptestvalue)) {
 	    if (isMaster) cerr << "ERROR: Ptestvalue was inf or nan" << endl;
 	    break; // Jump out of while-loop, just print out the results
 	    // up to now and exit the program
@@ -1691,8 +1691,8 @@ int main(int varnum, char** vararg)
 	 */
 
 	// Allow output again
-	cout.rdbuf(cout_sbuf); // restore the original stream buffer
-	cerr.rdbuf(cerr_sbuf);
+	std::cout.rdbuf(cout_sbuf); // restore the original stream buffer
+	std::cerr.rdbuf(cerr_sbuf);
 
 	clock_t global_finish = clock();
 	double processing_time = (double(start_upscaling) - double(global_start))/CLOCKS_PER_SEC;
