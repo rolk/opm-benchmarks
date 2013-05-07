@@ -207,24 +207,12 @@ void setVoigtValue(SinglePhaseUpscaler::permtensor_t& K, int voigt_idx, double v
 int main(int varnum, char** vararg)
 {
 
-    // Print start-up message
-    cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
-
-    // Suppress output in benchmark version (both cout and cerr):
-    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
-    stringstream ss_null; // Stringstream to redirect all unwanted output
-    std::cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
-
-    std::streambuf* cerr_sbuf = std::cerr.rdbuf();
-    std::cerr.rdbuf(ss_null.rdbuf());
-
     // Variables used for timing/profiling:
     clock_t start, finish;
     double timeused = 0.0, timeused_tesselation = 0.0;
     double timeused_upscale_wallclock = 0.0;
 
     clock_t global_start = clock(); // Timing used for benchmarking
-
 
     /******************************************************************************
      * Step 1:
@@ -240,6 +228,17 @@ int main(int varnum, char** vararg)
 #endif
     bool isMaster = (mpi_rank == 0);
 
+    // Print start-up message
+    if (isMaster)
+	cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
+
+    // Suppress output in benchmark version (both cout and cerr):
+    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
+    stringstream ss_null; // Stringstream to redirect all unwanted output
+    std::cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
+
+    std::streambuf* cerr_sbuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(ss_null.rdbuf());
 
     if (varnum > 1) { // If arguments are supplied, show error ("upscale_relperm_benchmark" is the first (and only) "argument")
 	usageandexit();
