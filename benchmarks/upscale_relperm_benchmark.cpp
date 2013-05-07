@@ -230,7 +230,7 @@ int main(int varnum, char** vararg)
 
     // Print start-up message
     if (isMaster)
-	cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
+        cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
 
     // Suppress output in benchmark version (both cout and cerr):
     std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
