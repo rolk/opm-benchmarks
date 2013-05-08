@@ -117,8 +117,16 @@
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
-#include "input/benchmark_tiny_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark_tiny.grdecl";
 char model_name[] = "Debug";
+char eclipseInput[] = {
+    #include "input/benchmark_tiny_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark_tiny_upscaled_relperm.dat"
+    0x00
+};
 #elif MODEL_TYPE == 1
 #include "input/benchmark20_input_data.cpp"
 char model_name[] = "Small";
@@ -131,6 +139,12 @@ char model_name[] = "Large";
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0-3.
 #endif
+
+static char* ROCKFILENAME = "stonefile_benchmark.txt";
+char rockString[] = {
+    #include "input/stonefile_benchmark.dat"
+    0x00
+};
 
 // Define tolerance to be used when comparing results.
 double tolerance = 1e-4;
@@ -355,7 +369,7 @@ int main(int varnum, char** vararg)
     // Benchmark version:
     Opm::EclipseGridParser eclParser;
     stringstream gridstream(stringstream::in | stringstream::out);
-    gridstream << eclipseInput;
+    gridstream.str(eclipseInput);
     eclParser.read(gridstream, false);
 
     finish = clock();   timeused = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -548,7 +562,7 @@ int main(int varnum, char** vararg)
 
     // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
     stringstream stonestream(stringstream::in | stringstream::out);
-    stonestream << stone_string;
+    stonestream.str(rockString);
     vector<double> inputWaterSaturation;
     vector<double> inputRelPerm;
     vector<double> inputJfunction;
@@ -1631,7 +1645,7 @@ int main(int varnum, char** vararg)
 
 	// Get upscaled data from string variable in benchmark_input_data.cpp.
 	stringstream referencestream(stringstream::in | stringstream::out);
-	referencestream << result_string;
+	referencestream.str(resultString);
 	double next_reference_nr;
 	for (int i=0; i < points; ++i) {
 	    referencestream >> next_reference_nr;
