@@ -128,14 +128,38 @@ char resultString[] = {
     0x00
 };
 #elif MODEL_TYPE == 1
-#include "input/benchmark20_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark20.grdecl";
 char model_name[] = "Small";
+char eclipseInput[] = {
+    #include "input/benchmark20_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark20_upscaled_relperm.dat"
+    0x00
+};
 #elif MODEL_TYPE == 2
-#include "input/benchmark75_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark75.grdecl";
 char model_name[] = "Medium";
+char eclipseInput[] = {
+    #include "input/benchmark75_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark75_upscaled_relperm.dat"
+    0x00
+};
 #elif MODEL_TYPE == 3
-#include "input/benchmark150_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark150.grdecl";
 char model_name[] = "Large";
+char eclipseInput[] = {
+    #include "input/benchmark150_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark150_upscaled_relperm.dat"
+    0x00
+};
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0-3.
 #endif
