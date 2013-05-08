@@ -1645,18 +1645,22 @@ int main(int varnum, char** vararg)
 	// Get upscaled data from string variable in benchmark_input_data.cpp.
 	stringstream referencestream(stringstream::in | stringstream::out);
 	referencestream.str(resultString);
-	double next_reference_nr;
-	for (int i=0; i < points; ++i) {
-	    referencestream >> next_reference_nr;
-	    PvaluesReference.push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    WaterSaturationReference.push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[0].push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[1].push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[2].push_back(next_reference_nr);
+	string nextReferenceLine;
+	while (getline(referencestream, nextReferenceLine)) {
+	    if (nextReferenceLine[0] == '#') continue;
+	    stringstream line(stringstream::in | stringstream::out);
+	    double nextReferenceValue;
+	    line << nextReferenceLine;
+	    line >> nextReferenceValue;
+	    PvaluesReference.push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    WaterSaturationReference.push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[0].push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[1].push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[2].push_back(nextReferenceValue);
 	}
 
 	/*
