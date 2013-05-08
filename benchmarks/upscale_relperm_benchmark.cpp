@@ -567,15 +567,14 @@ int main(int varnum, char** vararg)
     vector<double> inputRelPerm;
     vector<double> inputJfunction;
 
-    double nextStoneValue;
     string nextStoneLine;
-    while (!stonestream.eof()) {
+    while (getline(stonestream, nextStoneLine)) {
+	if (nextStoneLine[0] == '#') continue;
+	double nextStoneValue;
 	stringstream line(stringstream::in | stringstream::out);
-	getline(stonestream, nextStoneLine);
 	line << nextStoneLine;
 	int colNr = 1;
-	while (!line.eof()) {
-	    line >> nextStoneValue;
+	while (line >> nextStoneValue) {
 	    if (colNr == 1) inputWaterSaturation.push_back(nextStoneValue);
 	    else if (colNr == relPermCurve) inputRelPerm.push_back(nextStoneValue);
 	    else if (colNr == jFunctionCurve) inputJfunction.push_back(nextStoneValue);
