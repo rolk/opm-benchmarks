@@ -26,31 +26,34 @@
    This is a benchmark version of upscale_relperm, whose ordinary description is given below.
    The main machinery is the same, but with some changes:
 
-   - Input data (grid file and stone file) is not provided from command line, but is built in at compiler time.
-   The data is stored as strings in input/benchmarkXXX_input_data.cpp, which is included below.
-   - Other command line options are not supported
-   - The construction of eclParser and stone data is changed due to change in input routine
-   - All checks on number of input from command line are removed (since this no longer is valid)
-   - Some option defaults are changed: points = 20
-   upscaleBothPhases = 0 (false)
-   jFunctionCurve = 3
-   - All output is surpressed, except final output in step 9. For each finished upscaling, a star is printed,
-   so that one can see the overall progress.
-   - A test for verification of computed solution is implemented in Step 9.
-   Reference solution is included in input/benchmarkXXX_input_data.cpp
+   - Input data (grid file, rock file and reference solution) is not provided from command line, 
+     but is built in at compiler time.
+     by embedding hexadecimal (1 byte) input data files. See README for further documentation.
+   - Other command line options are not supported.
+   - The construction of eclParser and stone data is changed due to change in input routine.
+   - All checks on number of input from command line are removed (since this no longer is valid).
+   - Some option defaults are changed: 
+       points = 20
+       upscaleBothPhases = 0 (false)
+       jFunctionCurve = 3
+       outputprecision = 20
+   - All output is surpressed, except for a start-up message and the final output in step 9.
+   - A test for verification of computed solution is implemented in Step 9. The comparison is done
+     within an absolute tolerance that can be changed below.
    - Output provided in Step 9 is changed to fit the benchmark suite
 
-   There are two models available with different model sizes. It is important that the model size don't fit into
-   the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. The tolerance to be used when
-   comparing results can also be changed below. To re-build simply run 'make' inside the directory 'benchmarks'
-   (where this source file is situated).
+   There are two models available with different model sizes. It is important that the model size 
+   don't fit into the cache. The model type can be chosen below by changing the macro 'MODEL_TYPE'. 
+   The tolerance to be used when comparing results can also be changed below. To re-build simply 
+   run 'make' inside the root directory (opm-benchmarks).
 
    Assumptions:
    - Only one stone type
    - Isotropic input data
    - upscales only one phase
+*/
 
-
+/**
    Original description of upscale_relperm:
 
    Reads in a lithofacies geometry in Eclipse format, reads in J(S_w)
@@ -109,12 +112,15 @@
 #include <opm/upscaling/SinglePhaseUpscaler.hpp>
 
 // Choose model:
-//   - Debug: MODEL_TYPE 0 (1138 active cells, <0 MB)
+//   - Debug: MODEL_TYPE 0  (1138 active cells, ~0 MB)
 //   - Small: MODEL_TYPE 1  (35751 active cells, ~5 MB)
 //   - Large: MODEL_TYPE 2  (175045 active cells, ~23 MB)
 #define MODEL_TYPE 1
 
-// Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
+// Define tolerance to be used when comparing results.
+double tolerance = 1e-4;
+
+// Include eclipse grid file and reference solution by embedding hexadecimal input data files.
 #if MODEL_TYPE == 0
 static char* ECLIPSEFILENAME = "benchmark_tiny.grdecl";
 char model_name[] = "Debug";
@@ -152,14 +158,13 @@ char resultString[] = {
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0-2.
 #endif
 
+// Include rock file by embedding hexadecimal input data file.
 static char* ROCKFILENAME = "stonefile_benchmark.txt";
 char rockString[] = {
     #include "input/stonefile_benchmark.dat"
     0x00
 };
 
-// Define tolerance to be used when comparing results.
-double tolerance = 1e-4;
 
 using namespace Opm;
 using namespace std;
@@ -259,7 +264,7 @@ int main(int varnum, char** vararg)
         cout << "Running benchmark version of upscale_relperm (model type: " << model_name << ") ..." << endl;
 
     // Suppress output in benchmark version (both cout and cerr):
-    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original sbuf
+    std::streambuf* cout_sbuf = std::cout.rdbuf(); // save original streambuf
     stringstream ss_null; // Stringstream to redirect all unwanted output
     std::cout.rdbuf(ss_null.rdbuf()); // redirect 'cout' to ss_null
 
@@ -370,7 +375,6 @@ int main(int varnum, char** vararg)
 
     // Read data from the Eclipse file and
     // populate our vectors with data from the file
-
 
     if (isMaster) cout << "Parsing Eclipse file <" << ECLIPSEFILENAME << "> ... ";
     flush(cout);   start = clock();
@@ -1654,8 +1658,7 @@ int main(int varnum, char** vararg)
 	RelPermValuesReference.push_back(tempVec);
 	RelPermValuesReference.push_back(tempVec);
 
-	// Get upscaled data from string variable in benchmark_input_data.cpp.
-	stringstream referencestream(stringstream::in | stringstream::out);
+	// Read reference solution
 	referencestream.str(resultString);
 	string nextReferenceLine;
 	while (getline(referencestream, nextReferenceLine)) {
@@ -1674,15 +1677,6 @@ int main(int varnum, char** vararg)
 	    line >> nextReferenceValue;
 	    RelPermValuesReference[2].push_back(nextReferenceValue);
 	}
-
-	/*
-	// Display results
-	dispVec("Pressure", PvaluesReference);
-	dispVec("Saturation", WaterSaturationReference);
-	dispVec("Relpermx", RelPermValuesReference[0]);
-	dispVec("Relpermy", RelPermValuesReference[1]);
-	dispVec("Relpermz", RelPermValuesReference[2]);
-	*/
 
 	// Check that number of upscaled points matches
 	if (WaterSaturationReference.size() != points) referenceResultsMatch = false;
