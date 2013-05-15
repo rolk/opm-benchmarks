@@ -122,7 +122,6 @@ double tolerance = 1e-4;
 
 // Include eclipse grid file and reference solution by embedding hexadecimal input data files.
 #if MODEL_TYPE == 0
-static char* ECLIPSEFILENAME = "benchmark_tiny.grdecl";
 char model_name[] = "Debug";
 char eclipseInput[] = {
     #include "input/benchmark_tiny_grid.dat"
@@ -133,7 +132,6 @@ char resultString[] = {
     0x00
 };
 #elif MODEL_TYPE == 1
-static char* ECLIPSEFILENAME = "benchmark20.grdecl";
 char model_name[] = "Small";
 char eclipseInput[] = {
     #include "input/benchmark20_grid.dat"
@@ -144,7 +142,6 @@ char resultString[] = {
     0x00
 };
 #elif MODEL_TYPE == 2
-static char* ECLIPSEFILENAME = "benchmark75.grdecl";
 char model_name[] = "Large";
 char eclipseInput[] = {
     #include "input/benchmark75_grid.dat"
@@ -159,7 +156,6 @@ char resultString[] = {
 #endif
 
 // Include rock file by embedding hexadecimal input data file.
-static char* ROCKFILENAME = "stonefile_benchmark.txt";
 char rockString[] = {
     #include "input/stonefile_benchmark.dat"
     0x00
@@ -376,7 +372,7 @@ int main(int varnum, char** vararg)
     // Read data from the Eclipse file and
     // populate our vectors with data from the file
 
-    if (isMaster) cout << "Parsing Eclipse file <" << ECLIPSEFILENAME << "> ... ";
+    if (isMaster) cout << "Parsing Eclipse file... ";
     flush(cout);   start = clock();
 
     // Original parsing command:
@@ -395,7 +391,7 @@ int main(int varnum, char** vararg)
     // Check that we have the information we need from the eclipse file:
     if (! (eclParser.hasField("SPECGRID") && eclParser.hasField("COORD") && eclParser.hasField("ZCORN")
 	   && eclParser.hasField("PORO") && eclParser.hasField("PERMX"))) {
-	if (isMaster) cerr << "Error: Did not find SPECGRID, COORD, ZCORN, PORO and PERMX in Eclipse file " << ECLIPSEFILENAME << endl;
+	if (isMaster) cerr << "Error: Did not find SPECGRID, COORD, ZCORN, PORO and PERMX in Eclipse file." << endl;
 	usageandexit();
     }
 
@@ -609,7 +605,7 @@ int main(int varnum, char** vararg)
 	    if (isMaster) cout << "Error: J-function curve not strictly monotone" << endl;
 	    usageandexit();
 	}
-	JfunctionNames.push_back(ROCKFILENAME);
+	JfunctionNames.push_back("stonefile_benchmark.txt");
     }
 
     // Check if input relperm curves satisfy Eclipse requirement of specifying critical saturations
@@ -1740,7 +1736,7 @@ int main(int varnum, char** vararg)
 	int model_size = (8*nCellsTotal + 2*nCellsTotal + (x_res+1)*(y_res+1)*2)*sizeof(double) + 2*nCellsTotal*sizeof(int);
 
 	outputtmp << dashed_line;
-	outputtmp << "Model type :      " << model_name << " (" << ECLIPSEFILENAME << ")" << endl;
+	outputtmp << "Model type :      " << model_name << endl;
 	outputtmp << "Active cells:     " << tesselatedCells << endl;
 	outputtmp << "Model size:       ~" << model_size/1000000 << " MB" << endl;
 	outputtmp << "Upscaling points: " << points << endl;
