@@ -111,8 +111,7 @@
 // Choose model:
 //   - Debug: MODEL_TYPE 0 (1138 active cells, <0 MB)
 //   - Small: MODEL_TYPE 1  (35751 active cells, ~5 MB)
-//   - Medium: MODEL_TYPE 2  (175045 active cells, ~23 MB)
-//   - Large: MODEL_TYPE 3  (711539 active cells, ~93 MB)
+//   - Large: MODEL_TYPE 2  (175045 active cells, ~23 MB)
 #define MODEL_TYPE 0
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
@@ -140,7 +139,7 @@ char resultString[] = {
 };
 #elif MODEL_TYPE == 2
 static char* ECLIPSEFILENAME = "benchmark75.grdecl";
-char model_name[] = "Medium";
+char model_name[] = "Large";
 char eclipseInput[] = {
     #include "input/benchmark75_grid.dat"
     0x00
@@ -149,19 +148,8 @@ char resultString[] = {
     #include "input/benchmark75_upscaled_relperm.dat"
     0x00
 };
-#elif MODEL_TYPE == 3
-static char* ECLIPSEFILENAME = "benchmark150.grdecl";
-char model_name[] = "Large";
-char eclipseInput[] = {
-    #include "input/benchmark150_grid.dat"
-    0x00
-};
-char resultString[] = {
-    #include "input/benchmark150_upscaled_relperm.dat"
-    0x00
-};
 #else
-#error The macro 'MODEL_TYPE' is invalid. Possible values are 0-3.
+#error The macro 'MODEL_TYPE' is invalid. Possible values are 0-2.
 #endif
 
 static char* ROCKFILENAME = "stonefile_benchmark.txt";
