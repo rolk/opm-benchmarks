@@ -1655,6 +1655,7 @@ int main(int varnum, char** vararg)
 	RelPermValuesReference.push_back(tempVec);
 
 	// Read reference solution
+	stringstream referencestream(stringstream::in | stringstream::out);
 	referencestream.str(resultString);
 	string nextReferenceLine;
 	while (getline(referencestream, nextReferenceLine)) {
