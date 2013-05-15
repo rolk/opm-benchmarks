@@ -112,7 +112,7 @@
 //   - Debug: MODEL_TYPE 0 (1138 active cells, <0 MB)
 //   - Small: MODEL_TYPE 1  (35751 active cells, ~5 MB)
 //   - Large: MODEL_TYPE 2  (175045 active cells, ~23 MB)
-#define MODEL_TYPE 0
+#define MODEL_TYPE 1
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
