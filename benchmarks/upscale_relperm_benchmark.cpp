@@ -111,26 +111,52 @@
 // Choose model:
 //   - Debug: MODEL_TYPE 0 (1138 active cells, <0 MB)
 //   - Small: MODEL_TYPE 1  (35751 active cells, ~5 MB)
-//   - Medium: MODEL_TYPE 2  (175045 active cells, ~23 MB)
-//   - Large: MODEL_TYPE 3  (711539 active cells, ~93 MB)
+//   - Large: MODEL_TYPE 2  (175045 active cells, ~23 MB)
 #define MODEL_TYPE 1
 
 // Benchmark input data (this file can be generated from script 'createInputDataFiles.sh')
 #if MODEL_TYPE == 0
-#include "input/benchmark_tiny_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark_tiny.grdecl";
 char model_name[] = "Debug";
+char eclipseInput[] = {
+    #include "input/benchmark_tiny_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark_tiny_upscaled_relperm.dat"
+    0x00
+};
 #elif MODEL_TYPE == 1
-#include "input/benchmark20_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark20.grdecl";
 char model_name[] = "Small";
+char eclipseInput[] = {
+    #include "input/benchmark20_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark20_upscaled_relperm.dat"
+    0x00
+};
 #elif MODEL_TYPE == 2
-#include "input/benchmark75_input_data.cpp"
-char model_name[] = "Medium";
-#elif MODEL_TYPE == 3
-#include "input/benchmark150_input_data.cpp"
+static char* ECLIPSEFILENAME = "benchmark75.grdecl";
 char model_name[] = "Large";
+char eclipseInput[] = {
+    #include "input/benchmark75_grid.dat"
+    0x00
+};
+char resultString[] = {
+    #include "input/benchmark75_upscaled_relperm.dat"
+    0x00
+};
 #else
-#error The macro 'MODEL_TYPE' is invalid. Possible values are 0-3.
+#error The macro 'MODEL_TYPE' is invalid. Possible values are 0-2.
 #endif
+
+static char* ROCKFILENAME = "stonefile_benchmark.txt";
+char rockString[] = {
+    #include "input/stonefile_benchmark.dat"
+    0x00
+};
 
 // Define tolerance to be used when comparing results.
 double tolerance = 1e-4;
@@ -355,7 +381,7 @@ int main(int varnum, char** vararg)
     // Benchmark version:
     Opm::EclipseGridParser eclParser;
     stringstream gridstream(stringstream::in | stringstream::out);
-    gridstream << eclipseInput;
+    gridstream.str(eclipseInput);
     eclParser.read(gridstream, false);
 
     finish = clock();   timeused = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -548,20 +574,19 @@ int main(int varnum, char** vararg)
 
     // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
     stringstream stonestream(stringstream::in | stringstream::out);
-    stonestream << stone_string;
+    stonestream.str(rockString);
     vector<double> inputWaterSaturation;
     vector<double> inputRelPerm;
     vector<double> inputJfunction;
 
-    double nextStoneValue;
     string nextStoneLine;
-    while (!stonestream.eof()) {
+    while (getline(stonestream, nextStoneLine)) {
+	if (nextStoneLine[0] == '#') continue;
+	double nextStoneValue;
 	stringstream line(stringstream::in | stringstream::out);
-	getline(stonestream, nextStoneLine);
 	line << nextStoneLine;
 	int colNr = 1;
-	while (!line.eof()) {
-	    line >> nextStoneValue;
+	while (line >> nextStoneValue) {
 	    if (colNr == 1) inputWaterSaturation.push_back(nextStoneValue);
 	    else if (colNr == relPermCurve) inputRelPerm.push_back(nextStoneValue);
 	    else if (colNr == jFunctionCurve) inputJfunction.push_back(nextStoneValue);
@@ -1631,19 +1656,23 @@ int main(int varnum, char** vararg)
 
 	// Get upscaled data from string variable in benchmark_input_data.cpp.
 	stringstream referencestream(stringstream::in | stringstream::out);
-	referencestream << result_string;
-	double next_reference_nr;
-	for (int i=0; i < points; ++i) {
-	    referencestream >> next_reference_nr;
-	    PvaluesReference.push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    WaterSaturationReference.push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[0].push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[1].push_back(next_reference_nr);
-	    referencestream >> next_reference_nr;
-	    RelPermValuesReference[2].push_back(next_reference_nr);
+	referencestream.str(resultString);
+	string nextReferenceLine;
+	while (getline(referencestream, nextReferenceLine)) {
+	    if (nextReferenceLine[0] == '#') continue;
+	    stringstream line(stringstream::in | stringstream::out);
+	    double nextReferenceValue;
+	    line << nextReferenceLine;
+	    line >> nextReferenceValue;
+	    PvaluesReference.push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    WaterSaturationReference.push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[0].push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[1].push_back(nextReferenceValue);
+	    line >> nextReferenceValue;
+	    RelPermValuesReference[2].push_back(nextReferenceValue);
 	}
 
 	/*
