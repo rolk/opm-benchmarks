@@ -12,6 +12,7 @@ set (${project}_VERSION_MINOR 0)
 # defines that must be present in config.h for our headers
 set (${project}_CONFIG_VAR
 	HAVE_MPI
+	OPM_BENCHMARKS_VERSION_STRING
 	)
 
 # dependencies
@@ -52,6 +53,7 @@ system_info ()
 # very early try to print repo id (to pinpoint version if something goes wrong)
 include (UseVCSInfo)
 vcs_info ()
+vcs_verstr (${project})
 
 # print toolchain information to identify compilers with potential bugs
 include (UseCompVer)
