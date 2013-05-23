@@ -3,16 +3,20 @@
 
 # key information about the program
 set (project "opm-benchmarks")
+string (TOUPPER "${project}" PROJECT)
+string (REPLACE "-" "_" PROJECT "${PROJECT}")
 set (${project}_NAME "${project}")
 set (${project}_DESCRIPTION "Open Porous Media Initiative Benchmarks")
 set (${project}_DIR "benchmarks")
 set (${project}_VERSION_MAJOR 1)
 set (${project}_VERSION_MINOR 0)
+set (${PROJECT}_RELEASE_STRING "2013.03")
 
 # defines that must be present in config.h for our headers
 set (${project}_CONFIG_VAR
 	HAVE_MPI
-	OPM_BENCHMARKS_VERSION_STRING
+	${PROJECT}_VERSION_STRING
+	${PROJECT}_RELEASE_STRING
 	)
 
 # dependencies
