@@ -187,3 +187,6 @@ endif (PRECOMPILE_HEADERS)
 ### clean in-source builds ###
 include (OpmDistClean)
 opm_dist_clean (${project})
+
+### emulate the with-xxx feature of autotools;
+include (OpmKnown)
