@@ -6,6 +6,7 @@
 Module: opm-benchmarks
 Description: DUNE module containing benchmarks for the OPM project
 Version: 0.1
+Label: 2013.03
 Maintainer: laods@statoil.com
 #depending on 
 Depends: dune-common dune-grid dune-istl dune-cornerpoint opm-porsol opm-upscaling
