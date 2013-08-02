@@ -4,6 +4,7 @@
 
 #Name of the module
 Module: opm-benchmarks
+Description: DUNE module containing benchmarks for the OPM project
 Version: 0.1
 Maintainer: laods@statoil.com
 #depending on 
