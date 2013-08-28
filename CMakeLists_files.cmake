@@ -26,7 +26,6 @@
 # originally generated with the command:
 # find opm -name '*.c*' -printf '\t%p\n' | sort
 list (APPEND MAIN_SOURCE_FILES
-	benchmarks/upscale_relperm_benchmark.cpp
 	)
 
 # originally generated with the command:
@@ -42,6 +41,7 @@ list (APPEND TEST_DATA_FILES
 # originally generated with the command:
 # find tutorials examples -name '*.c*' -printf '\t%p\n' | sort
 list (APPEND EXAMPLE_SOURCE_FILES
+	benchmarks/upscale_relperm_benchmark.cpp
 	)
 
 # originally generated with the command:
