@@ -13,7 +13,9 @@
 inputfile="$1"
 outputfile="$2"
 
-od -v -t x1 "$inputfile" | sed \
+cat "$inputfile" | \
+od -v -t x1 | \
+sed \
 's/^[0-9A-Fa-f]\{1,\} *//
 /^ *$/d
 s/ \{1,\}/,0x/g

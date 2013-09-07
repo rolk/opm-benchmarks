@@ -228,6 +228,9 @@ void setVoigtValue(SinglePhaseUpscaler::permtensor_t& K, int voigt_idx, double v
     }
 }
 
+void inflate (const char* input, stringstream& output) {
+    output.str (input);
+}
 
 int main(int varnum, char** vararg)
 {
@@ -379,7 +382,7 @@ int main(int varnum, char** vararg)
     // Benchmark version:
     Opm::EclipseGridParser eclParser;
     stringstream gridstream(stringstream::in | stringstream::out);
-    gridstream.str(eclipseInput);
+    inflate (eclipseInput, gridstream);
     eclParser.read(gridstream, false);
 
     finish = clock();   timeused = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -572,7 +575,7 @@ int main(int varnum, char** vararg)
 
     // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
     stringstream stonestream(stringstream::in | stringstream::out);
-    stonestream.str(rockString);
+    inflate (rockString, stonestream);
     vector<double> inputWaterSaturation;
     vector<double> inputRelPerm;
     vector<double> inputJfunction;
@@ -1654,7 +1657,7 @@ int main(int varnum, char** vararg)
 
         // Read reference solution
         stringstream referencestream(stringstream::in | stringstream::out);
-        referencestream.str(resultString);
+        inflate (resultString, referencestream);
         string nextReferenceLine;
         while (getline(referencestream, nextReferenceLine)) {
             if (nextReferenceLine[0] == '#') continue;
