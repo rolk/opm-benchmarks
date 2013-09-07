@@ -106,6 +106,10 @@
 #include <mpi.h>
 #endif
 
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
 #include <opm/core/utility/MonotCubicInterpolator.hpp>
 #include <opm/upscaling/SinglePhaseUpscaler.hpp>
 
@@ -121,47 +125,41 @@ double tolerance = 1e-4;
 // Include eclipse grid file and reference solution by embedding hexadecimal input data files.
 #if MODEL_TYPE == 0
 char model_name[] = "Debug";
-char eclipseInput[] = {
+unsigned char eclipseInput[] = {
     #include <benchmarks/input/benchmark_tiny_grid.grdecl.gz.hex>
-    0x00
 };
-char resultString[] = {
+unsigned char resultString[] = {
     #include <benchmarks/input/benchmark_tiny_upscaled_relperm.out.gz.hex>
-    0x00
 };
 #elif MODEL_TYPE == 1
 char model_name[] = "Small";
-char eclipseInput[] = {
+unsigned char eclipseInput[] = {
     #include <benchmarks/input/benchmark20_grid.grdecl.gz.hex>
-    0x00
 };
-char resultString[] = {
+unsigned char resultString[] = {
     #include <benchmarks/input/benchmark20_upscaled_relperm.out.gz.hex>
-    0x00
 };
 #elif MODEL_TYPE == 2
 char model_name[] = "Large";
-char eclipseInput[] = {
+unsigned char eclipseInput[] = {
     #include <benchmarks/input/benchmark75_grid.grdecl.gz.hex>
-    0x00
 };
-char resultString[] = {
+unsigned char resultString[] = {
     #include <benchmarks/input/benchmark75_upscaled_relperm.out.gz.hex>
-    0x00
 };
 #else
 #error The macro 'MODEL_TYPE' is invalid. Possible values are 0-2.
 #endif
 
 // Include rock file by embedding hexadecimal input data file.
-char rockString[] = {
+unsigned char rockString[] = {
     #include <benchmarks/input/stonefile_benchmark.txt.gz.hex>
-    0x00
 };
 
 
 using namespace Opm;
 using namespace std;
+namespace io = boost::iostreams;
 
 // Function for displaying a vector. Used for testing purposes
 void dispVec(string name, vector<double> vec) {
@@ -228,8 +226,18 @@ void setVoigtValue(SinglePhaseUpscaler::permtensor_t& K, int voigt_idx, double v
     }
 }
 
-void inflate (const char* input, stringstream& output) {
-    output.str (input);
+void inflate (const unsigned char* input, const int size, stringstream& output) {
+    // read compressed data raw from .data segment into buffer
+    stringstream compressed;
+    std::copy (input, input+size, ostream_iterator <char> (compressed));
+
+    // setup a filter which decompress the memory stream
+    io::filtering_istream filter;
+    filter.push (io::gzip_decompressor ());
+    filter.push (compressed);
+
+    // return the decompressed copy
+    io::copy (filter, output);
 }
 
 int main(int varnum, char** vararg)
@@ -382,7 +390,7 @@ int main(int varnum, char** vararg)
     // Benchmark version:
     Opm::EclipseGridParser eclParser;
     stringstream gridstream(stringstream::in | stringstream::out);
-    inflate (eclipseInput, gridstream);
+    inflate (eclipseInput, sizeof (eclipseInput) / sizeof (eclipseInput[0]), gridstream);
     eclParser.read(gridstream, false);
 
     finish = clock();   timeused = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -575,7 +583,7 @@ int main(int varnum, char** vararg)
 
     // Benchmark version: (assumes only one phase to be upscaled, and only one stone type)
     stringstream stonestream(stringstream::in | stringstream::out);
-    inflate (rockString, stonestream);
+    inflate (rockString, sizeof (rockString) / sizeof (rockString[0]), stonestream);
     vector<double> inputWaterSaturation;
     vector<double> inputRelPerm;
     vector<double> inputJfunction;
@@ -1657,7 +1665,7 @@ int main(int varnum, char** vararg)
 
         // Read reference solution
         stringstream referencestream(stringstream::in | stringstream::out);
-        inflate (resultString, referencestream);
+        inflate (resultString, sizeof (resultString) / sizeof (resultString[0]), referencestream);
         string nextReferenceLine;
         while (getline(referencestream, nextReferenceLine)) {
             if (nextReferenceLine[0] == '#') continue;

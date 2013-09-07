@@ -14,6 +14,7 @@ inputfile="$1"
 outputfile="$2"
 
 cat "$inputfile" | \
+gzip -9 | \
 od -v -t x1 | \
 sed \
 's/^[0-9A-Fa-f]\{1,\} *//
