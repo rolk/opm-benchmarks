@@ -13,11 +13,12 @@ macro (pack_file case_dir case_name suffix in_ext out_ext)
   file (MAKE_DIRECTORY "${output_dir}")
 
   # run the shell script to encode the file
+  set (pack_script "${PROJECT_SOURCE_DIR}/benchmarks/input/create_hex_data_file.sh")
   add_custom_command (
 	OUTPUT "${output_file}"
-	COMMAND "${PROJECT_SOURCE_DIR}/benchmarks/input/create_hex_data_file.sh"
+	COMMAND "${pack_script}"
 	ARGS "${input_file}" "${output_file}"
-	DEPENDS "${input_file}"
+	DEPENDS "${input_file}" "${pack_script}"
 	COMMENT "Creating packed binary of ${rel_file}"
 	)
 
