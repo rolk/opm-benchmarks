@@ -29,8 +29,8 @@ endmacro (pack_file)
 
 # each case consists of a .grdecl file and a .data file
 macro (pack_case test_exe case_name)
-  pack_file ("benchmarks/input" "${case_name}" "_grid" ".grdecl" ".dat")
-  pack_file ("benchmarks/input" "${case_name}" "_upscaled_relperm" ".out" ".dat")
+  pack_file ("benchmarks/input" "${case_name}" "_grid" ".grdecl" ".grdecl.gz.hex")
+  pack_file ("benchmarks/input" "${case_name}" "_upscaled_relperm" ".out" ".out.gz.hex")
 
   # we cannot add files directly (sic) but must wrap in a target
   add_custom_target (${case_name} ALL DEPENDS ${${case_name}_DEPENDS})
@@ -39,7 +39,7 @@ endmacro (pack_case)
 
 # rel.perm curve is packed separately because it is common for all cases
 macro (pack_stone test_exe)
-	pack_file ("benchmarks/input" "stonefile" "_benchmark" ".txt" ".dat")
+	pack_file ("benchmarks/input" "stonefile" "_benchmark" ".txt" ".txt.gz.hex")
 	add_custom_target (stonefile ALL DEPENDS ${stonefile_DEPENDS})
 	add_dependencies ("${test_exe}" "stonefile")
 endmacro (pack_stone)

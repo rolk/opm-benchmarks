@@ -122,31 +122,31 @@ double tolerance = 1e-4;
 #if MODEL_TYPE == 0
 char model_name[] = "Debug";
 char eclipseInput[] = {
-    #include <benchmarks/input/benchmark_tiny_grid.dat>
+    #include <benchmarks/input/benchmark_tiny_grid.grdecl.gz.hex>
     0x00
 };
 char resultString[] = {
-    #include <benchmarks/input/benchmark_tiny_upscaled_relperm.dat>
+    #include <benchmarks/input/benchmark_tiny_upscaled_relperm.out.gz.hex>
     0x00
 };
 #elif MODEL_TYPE == 1
 char model_name[] = "Small";
 char eclipseInput[] = {
-    #include <benchmarks/input/benchmark20_grid.dat>
+    #include <benchmarks/input/benchmark20_grid.grdecl.gz.hex>
     0x00
 };
 char resultString[] = {
-    #include <benchmarks/input/benchmark20_upscaled_relperm.dat>
+    #include <benchmarks/input/benchmark20_upscaled_relperm.out.gz.hex>
     0x00
 };
 #elif MODEL_TYPE == 2
 char model_name[] = "Large";
 char eclipseInput[] = {
-    #include <benchmarks/input/benchmark75_grid.dat>
+    #include <benchmarks/input/benchmark75_grid.grdecl.gz.hex>
     0x00
 };
 char resultString[] = {
-    #include <benchmarks/input/benchmark75_upscaled_relperm.dat>
+    #include <benchmarks/input/benchmark75_upscaled_relperm.out.gz.hex>
     0x00
 };
 #else
@@ -155,7 +155,7 @@ char resultString[] = {
 
 // Include rock file by embedding hexadecimal input data file.
 char rockString[] = {
-    #include <benchmarks/input/stonefile_benchmark.dat>
+    #include <benchmarks/input/stonefile_benchmark.txt.gz.hex>
     0x00
 };
 
