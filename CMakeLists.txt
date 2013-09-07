@@ -61,3 +61,6 @@ endmacro (tests_hook)
 
 # all setup common to the OPM library modules is done here
 include (OpmLibMain)
+
+# encode test cases so they can be embedded in the executable
+include (${PROJECT_SOURCE_DIR}/EmbedCases.cmake)
